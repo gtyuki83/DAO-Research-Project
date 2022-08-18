@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     AppBar,
@@ -8,6 +8,8 @@ import {
     // IconButton,
     Box,
 } from '@material-ui/core'
+
+import CheckWallet from '../actions/checkWallet'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,6 +25,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ButtonAppBar() {
     const classes = useStyles();
+    const currentAccount = useState('')
+
+    useEffect(() => {
+        CheckWallet;
+    }, []);
+
     return (
         <div className={classes.root}>
             <AppBar position="static">
@@ -33,7 +41,7 @@ export default function ButtonAppBar() {
                     <Button color="inherit">Tasks</Button>
                     <Button color="inherit">Proposals</Button>
                     <Button color="inherit">Team</Button>
-                    <Button color="inherit">Your Account</Button>
+                    <Button color="inherit" onClick={null}>Login</Button>
                 </Toolbar>
             </AppBar>
         </div >
