@@ -1,7 +1,10 @@
-import logo from './logo.svg';
-import './styles/App.css';
-import Button from '@material-ui/core/Button';
-import Header from './components/Header'
+import logo from "./logo.svg";
+// import "./styles/App.css";
+import Button from "@material-ui/core/Button";
+
+// presentation
+import "./presentation/view_interfaces/styles/index.styl";
+import Header from "./presentation/view_interfaces/components/Header";
 
 function App() {
   return (
