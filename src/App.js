@@ -4,6 +4,7 @@ import Button from "@material-ui/core/Button";
 
 // presentation
 import "./presentation/view_interfaces/styles/index.styl";
+import "./presentation/view_interfaces/styles/App.css";
 import Header from "./presentation/view_interfaces/components/Header";
 
 function App() {
