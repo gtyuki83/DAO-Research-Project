@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  // IconButton,
-  Box,
-} from "@material-ui/core";
+import { AppBar, Toolbar, Typography, Button, Box } from "@material-ui/core";
 
 import CheckWallet from "../../../data/blockchain_actions/checkWallet";
 import Login from "../../../data/blockchain_actions/login";
