@@ -1,3 +1,9 @@
+# Guide for architecture
+
+Please find [these examples](https://medium.com/@rostislavdugin/the-clean-architecture-using-react-and-typescript-a832662af803).
+
+##
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
