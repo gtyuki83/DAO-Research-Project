@@ -1,34 +1,32 @@
 import logo from "./logo.svg";
 // import "./styles/App.css";
 import Button from "@material-ui/core/Button";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // presentation
 import "./presentation/view_interfaces/styles/index.styl";
 import "./presentation/view_interfaces/styles/App.css";
 import Header from "./presentation/view_interfaces/components/Header";
+import Teams from "./presentation/view_interfaces/Teams.tsx";
+import Tasks from "./presentation/view_interfaces/Tasks.tsx";
+import TaskDetail from "./presentation/view_interfaces/TaskDetail.tsx";
+import MyPage from "./presentation/view_interfaces/MyPage.tsx";
+import CreateTask from "./presentation/view_interfaces/CreateTask.tsx";
 
 function App() {
   return (
     <div className="App">
       <Header />
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-
-        <Button variant="contained" color="primary">
-          Hello World
-        </Button>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<div>Home</div>} />
+          <Route path="/teams" element={<Teams />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="tasks/new" element={<CreateTask />} />
+          <Route path="/tasks/${taskId}" element={<TaskDetail />} />
+          <Route path="/my-page" element={<MyPage />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
