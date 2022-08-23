@@ -1,6 +1,5 @@
 import logo from "./logo.svg";
 // import "./styles/App.css";
-import Button from "@material-ui/core/Button";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // presentation
@@ -12,6 +11,9 @@ import Tasks from "./presentation/view_interfaces/Tasks.tsx";
 import TaskDetail from "./presentation/view_interfaces/TaskDetail.tsx";
 import MyPage from "./presentation/view_interfaces/MyPage.tsx";
 import CreateTask from "./presentation/view_interfaces/CreateTask.tsx";
+
+// MUI
+import { ThemeProvider, createMuiTheme, makeStyles } from '@mui/styles';
 
 function App() {
   return (

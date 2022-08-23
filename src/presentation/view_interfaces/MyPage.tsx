@@ -1,32 +1,22 @@
 import React from "react";
 
-import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Avatar from '@material-ui/core/Avatar';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Divider from '@material-ui/core/Divider';
+import { makeStyles } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Avatar from '@mui/material/Avatar';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Divider from '@mui/material/Divider';
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 
-import { AccountCircle, AccessAlarm, ThreeDRotation, AccountBalanceWallet } from '@material-ui/icons';
+import { AccountCircle, AccessAlarm, ThreeDRotation, AccountBalanceWallet } from '@mui/icons-material';
 
-const useStyles = makeStyles({
-  root: {
-    flexGrow: 1,
-  },
-  grid: {
-    width: '100%',
-    maxWidth: 360,
-    bgcolor: 'background.paper',
-  },
-});
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -52,8 +42,6 @@ const TabPanel = (props) => {
 const MyPage = (props) => {
   const hoge: string = "";
 
-  const classes = useStyles();
-
   const CenteredTabs = (props) => {
     const [value, setValue] = React.useState(0);
     const handleChange = (event, newValue) => {
@@ -62,7 +50,7 @@ const MyPage = (props) => {
 
     return (
       <div>
-        <Paper className={classes.root}>
+        <Paper className="">
           <Tabs
             value={value}
             onChange={handleChange}
@@ -84,7 +72,7 @@ const MyPage = (props) => {
 
 
 
-  return <div className={classes.root}>
+  return <div className="">
     <Grid container>
       <Grid item>
         <List component="nav" aria-label="mailbox folders">

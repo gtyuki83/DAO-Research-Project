@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { AppBar, Toolbar, Typography, Button, Box } from "@material-ui/core";
+import { makeStyles } from "@mui/styles";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 
 import CheckWallet from "../../../data/blockchain_actions/checkWallet";
 import Login from "../../../data/blockchain_actions/login";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },
   menuButton: {
-    marginRight: theme.spacing(2),
+    // marginRight: spacing(2),
   },
   title: {
     flexGrow: 1,
@@ -48,7 +48,7 @@ export default function ButtonAppBar() {
         <Toolbar>
           <Typography variant="h5" className={classes.title}>
             <Box textAlign="left" className="title">
-              CoopX
+              Unyte
             </Box>
           </Typography>
           <Button color="inherit">Tasks</Button>
