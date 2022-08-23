@@ -10,6 +10,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Divider from '@material-ui/core/Divider';
 
 import Grid from "@material-ui/core/Grid";
@@ -84,14 +85,12 @@ const MyPage = (props) => {
 
 
   return <div className={classes.root}>
-    <Avatar
-      alt="Iron Man"
-      src="https://assets.stickpng.com/images/580b57fbd9996e24bc43c051.png"
-    // sx={{ width: 56, height: 56 }}
-    />
     <Grid container>
       <Grid item>
         <List component="nav" aria-label="mailbox folders">
+          <ListItemAvatar>
+            <Avatar alt="kakakakakku" src="https://assets.stickpng.com/images/580b57fbd9996e24bc43c051.png" />
+          </ListItemAvatar>
           <ListItem button>
             <ListItemIcon>
               <AccountCircle />

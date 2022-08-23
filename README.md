@@ -2,7 +2,9 @@
 
 Please find [these examples](https://medium.com/@rostislavdugin/the-clean-architecture-using-react-and-typescript-a832662af803).
 
-##
+# Environment
+
+- node: `v14.17.6`
 
 # Getting Started with Create React App
 
