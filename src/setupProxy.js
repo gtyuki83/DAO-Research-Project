@@ -7,16 +7,20 @@
 // };
 
 const { createProxyMiddleware } = require("http-proxy-middleware");
+const token = 'secret_xSth6IX9nYQ2hzYIBiJQeaLuksxg0czyANw0q6sfrdf';
 
 module.exports = function (app) {
     const headers = {
-        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`,
+        'Notion-Version': '2022-06-28',
     }
     app.use(
-        '/v1/databases/425af77e016c48da823b452f66035fc6/query',
-        createProxyMiddleware({
+        createProxyMiddleware(
+            '/aaaaaaaaaaaaaa', {
             target: 'https://api.notion.com/',
             changeOrigin: true,
+            secure: false,
+            headers: headers,
         })
     );
 };

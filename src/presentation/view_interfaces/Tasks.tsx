@@ -3,10 +3,6 @@ import axios from 'axios';
 // あくしおす
 // const axios = require('axios');
 
-axios.defaults.baseURL = 'http://localhost:3000';
-axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-
 const Tasks = () => {
   const hoge: string = "";
   const getNotionDatabaseData = async () => {
@@ -17,8 +13,7 @@ const Tasks = () => {
       url: 'https://api.notion.com/v1/databases/' + databaseId + '/query',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Notion-Version': '2021-08-16', // 2022年7月時点 必要に応じて変更してください
-        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28', // 2022年7月時点 必要に応じて変更してください
       },
       data: {
         filter: {
