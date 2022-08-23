@@ -1,7 +1,6 @@
 import React from "react";
 
 import { makeStyles } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -13,10 +12,23 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Divider from '@mui/material/Divider';
 
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
+
 import Grid from "@mui/material/Grid";
 
 import { AccountCircle, AccessAlarm, ThreeDRotation, AccountBalanceWallet } from '@mui/icons-material';
 
+import TableTest from "./TableTest.tsx";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -37,6 +49,18 @@ const TabPanel = (props) => {
     </div>
   );
 }
+
+function createData(
+  name: string,
+  address: string,
+) {
+  return { name, address };
+}
+
+const rows = [
+  createData('UWYZ.eth', '0x3a0bE810754f7f7D04fCA10E2C11E93ebb5BF19e'),
+  // createData('Yoshi', '0x3a0bE810754f7f7D04fCA10E2C11E93ebb5BF19e'),
+];
 
 
 const MyPage = (props) => {
@@ -70,51 +94,78 @@ const MyPage = (props) => {
     );
   }
 
+  const handleClick = () => {
+    console.info('You clicked the Chip.');
+  };
+
 
 
   return <div className="">
-    <Grid container>
-      <Grid item>
-        <List component="nav" aria-label="mailbox folders">
-          <ListItemAvatar>
-            <Avatar alt="kakakakakku" src="https://assets.stickpng.com/images/580b57fbd9996e24bc43c051.png" />
-          </ListItemAvatar>
-          <ListItem button>
-            <ListItemIcon>
-              <AccountCircle />
-            </ListItemIcon>
-            <ListItemText primary="Name" />
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemText primary="0xUYZ" />
-          </ListItem>
-          <Divider />
-        </List>
-      </Grid>
-      <Grid item>
-        <List component="nav" aria-label="mailbox folders">
-          <ListItem button>
-            <ListItemIcon>
-              <AccountBalanceWallet />
-            </ListItemIcon>
-            <ListItemText primary="Address" />
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemText primary="0x3a0bE810754f7f7D04fCA10E2C11E93ebb5BF19e" />
-          </ListItem>
-          <Divider />
-        </List>
-      </Grid>
-    </Grid>
-    <CenteredTabs labels={['label1', 'label2', 'label3']}>
-      <div>aaaaaaa
+    <Box>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <Grid item>
+                  <ListItemIcon>
+                    <AccountCircle />
+                  </ListItemIcon>
+                  <ListItemText primary="Name" />
+                </Grid>
+              </TableCell>
+              <TableCell >
+                <Grid item>
+                  <ListItemIcon>
+                    <AccountBalanceWallet />
+                  </ListItemIcon>
+                  <ListItemText primary="Address" />
+                </Grid>
+              </TableCell>
+
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow
+                key={row.name}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell>{row.address}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box >
+    <Divider></Divider>
+    <Stack direction="row" spacing={1}>
+      <Chip label="#Unyte" color="primary" onClick={handleClick} />
+      <Chip label="#PolygonTokyoHack" color="primary" variant="outlined" onClick={handleClick} />
+      <Chip label="#ETHOnline" color="primary" variant="outlined" onClick={handleClick} />
+    </Stack>
+    <CenteredTabs labels={['Proposals (3)', 'Submitted (5)', 'Admired (4)']}>
+      <div>
+        Earned：160 PSL
         <br />
-        a
+        Great!
+        <TableTest />
       </div>
-      <div>bb</div>
-      <div>cc</div>
+      <div>
+        Earned：240 SMT
+        <br />
+        Good!
+        <TableTest />
+      </div>
+      <div>
+        Earned：200 ADM
+        <br />
+        Nice!
+        <TableTest />
+      </div>
     </CenteredTabs>
   </div >;
 };

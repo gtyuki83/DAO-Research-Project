@@ -5,6 +5,9 @@ import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import CheckWallet from "../../../data/blockchain_actions/checkWallet";
 import Login from "../../../data/blockchain_actions/login";
 
+// リンクへのアクセス
+import { Link } from "react-router-dom";
+
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
@@ -51,11 +54,11 @@ export default function ButtonAppBar() {
               Unyte
             </Box>
           </Typography>
-          <Button color="inherit">Tasks</Button>
-          <Button color="inherit">Proposals</Button>
-          <Button color="inherit">Team</Button>
+          <Button color="inherit" component={Link} to="/tasks">Tasks</Button>
+          <Button color="inherit" component={Link} to="/proposals">Proposals</Button>
+          <Button color="inherit" component={Link} to="/teams">Team</Button>
           {currentAccount && (
-            <Button color="inherit" onClick={test}>
+            <Button color="inherit" component={Link} to="/my-page">
               {currentAccount.slice(0, 6)}...{currentAccount.slice(-6)}
             </Button>
           )}

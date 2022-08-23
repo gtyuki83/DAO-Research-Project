@@ -18,8 +18,8 @@ import { ThemeProvider, createMuiTheme, makeStyles } from '@mui/styles';
 function App() {
   return (
     <div className="App">
-      <Header />
       <BrowserRouter>
+        <Header />
         <Routes>
           <Route path="/" element={<div>Home</div>} />
           <Route path="/teams" element={<Teams />} />
