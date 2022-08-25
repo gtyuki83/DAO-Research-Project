@@ -28,7 +28,7 @@ import Grid from "@mui/material/Grid";
 
 import { AccountCircle, AccessAlarm, ThreeDRotation, AccountBalanceWallet } from '@mui/icons-material';
 
-import TableTest from "./TableTest.tsx";
+import TaskTable from "./TaskTable.tsx";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -152,19 +152,19 @@ const MyPage = (props) => {
         Earned：160 PSL
         <br />
         Great!
-        <TableTest />
+        <TaskTable />
       </div>
       <div>
         Earned：240 SMT
         <br />
         Good!
-        <TableTest />
+        <TaskTable />
       </div>
       <div>
         Earned：200 ADM
         <br />
         Nice!
-        <TableTest />
+        <TaskTable />
       </div>
     </CenteredTabs>
   </div >;

@@ -1,7 +1,7 @@
 import React from "react";
 import axios from 'axios';
-// あくしおす
-// const axios = require('axios');
+
+import TaskTable from "./TaskTable.tsx";
 
 const Tasks = () => {
   const hoge: string = "";
@@ -64,6 +64,7 @@ const Tasks = () => {
   return <div>hoge
     <span className="likeButton_plus" onClick={getNotionDatabaseData}>+
     </span>
+    <TaskTable />
   </div>;
 };
 
