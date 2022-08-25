@@ -4,11 +4,13 @@ import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 
 import CheckWallet from "../../../data/blockchain_actions/checkWallet";
 import Login from "../../../data/blockchain_actions/login";
+import "./Header.css";
 
 // リンクへのアクセス
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
+  mode: 'dark',
   root: {
     flexGrow: 1,
   },
@@ -46,9 +48,9 @@ export default function ButtonAppBar() {
   };
 
   return (
-    <div className={classes.root}>
+    <div className="">
       <AppBar position="static">
-        <Toolbar>
+        <Toolbar className="header">
           <Typography variant="h5" className={classes.title}>
             <Box textAlign="left" className="title">
               Unyte
@@ -58,7 +60,7 @@ export default function ButtonAppBar() {
           <Button color="inherit" component={Link} to="/proposals">Proposals</Button>
           <Button color="inherit" component={Link} to="/teams">Team</Button>
           {currentAccount && (
-            <Button color="inherit" component={Link} to="/my-page">
+            <Button color="inherit" component={Link} to="/mypage">
               {currentAccount.slice(0, 6)}...{currentAccount.slice(-6)}
             </Button>
           )}
