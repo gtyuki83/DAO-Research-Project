@@ -145,13 +145,43 @@ export default function StickyHeadTable(taskid) {
   const [outputId, setOutputId] = React.useState(null);
   const [arr, setArr] = React.useState({});
 
+  async function readOutput() {
+    const docRef = doc(firebaseFirestore, "outputs", outputId);
+    const docSnap = await getDoc(docRef);
+    const link = docSnap.data().link
+    const desc = docSnap.data().description
+    // await setArr({ link: link, desc: desc, account: docSnap.data().account, state: "False", id: docSnap.data().outputid })
+    return ({ link: link, desc: desc, account: docSnap.data().account, state: "False", id: docSnap.data().outputid })
+  };
+
+  useEffect(() => {
+    const func = new Promise((resolve, reject) => {
+      const arr = readOutput();
+      if (arr != null) {
+        resolve(arr)
+      } else {
+        reject(new Error('error'));
+      }
+    });
+    func.then((value) => {
+      console.log(value);  // 1
+      setArr(value);
+    }, (error) => {
+      console.error("error:", error.message);
+    });
+    console.log("arr")
+  }, [outputId]);
+
   const TaskOutputModal = () => {
-    const docRef = doc(firebaseFirestore, "outputs", "EW77C630mk9XeG7PVwX6");
-    const docSnap = getDoc(docRef);
-    // const link = docSnap.data().link
-    // const desc = docSnap.data().description
-    // setArr({ link: link, desc: desc, account: docSnap.data().account, state: "False", id: docSnap.data().outputid })
-    console.log(arr)
+    // async function readOutput() {
+    //   const docRef = doc(firebaseFirestore, "outputs", "EW77C630mk9XeG7PVwX6");
+    //   const docSnap = await getDoc(docRef);
+    //   const link = docSnap.data().link
+    //   const desc = docSnap.data().description
+    //   await setArr({ link: link, desc: desc, account: docSnap.data().account, state: "False", id: docSnap.data().outputid })
+    // };
+    // func.then(() => console.log(arr))
+    // console.log(Promise.resolve(arr))
 
     return (
       <div>
@@ -162,10 +192,21 @@ export default function StickyHeadTable(taskid) {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
+            <Typography id="modal-modal-title" variant="h4" component="h2">
               Detail
             </Typography>
-            {/* {arr.link} */}
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              link:
+            </Typography>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              {arr.link}
+            </Typography>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Descripition:
+            </Typography>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              {arr.desc}
+            </Typography>
           </Box>
         </Modal>
       </div>
