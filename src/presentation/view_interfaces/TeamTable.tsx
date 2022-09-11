@@ -15,19 +15,24 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import Button from '@mui/material/Button';
-import SendIcon from '@mui/icons-material/Send';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+
+// Firebase関係
+import {
+  collection,
+  getDocs,
+  query,
+} from "firebase/firestore";
+import { firebaseFirestore } from "../../data/Firebase";
 
 // MUI
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 // ダークモード判定
 import useMediaQuery from '@mui/material/useMediaQuery';
+
+import AddMemberModal from "./AddMemberModal.tsx";
+import { useEffect, useState } from 'react';
 
 const theme = createTheme({
   palette: {
@@ -58,6 +63,7 @@ function createData(
   name: string,
   role: string,
 ): Data {
+
   return {
     address,
     name,
@@ -65,11 +71,6 @@ function createData(
   };
 }
 
-const rows = [
-  createData('0x2B953E5eA9a210e22f52A9081c5Bcc2d4c22fca1', 'UWYZ.eth', 'Founder'),
-  createData('0x2B953E5eA9a210e22f52A9081c5Bcc2d4c22fca1', 'Yoshi	', 'Engineer'),
-  createData('0x2B953E5eA9a210e22f52A9081c5Bcc2d4c22fca1', 'Funa	', 'Designer'),
-];
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -87,9 +88,9 @@ function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key,
 ): (
-    a: { [key in Key]: number | string },
-    b: { [key in Key]: number | string },
-  ) => number {
+  a: { [key in Key]: number | string },
+  b: { [key in Key]: number | string },
+) => number {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
@@ -124,16 +125,16 @@ const headCells: readonly HeadCell[] = [
     label: 'Name',
   },
   {
-    id: 'address',
-    numeric: false,
-    disablePadding: false,
-    label: 'Address',
-  },
-  {
     id: 'role',
     numeric: false,
     disablePadding: false,
     label: 'Role',
+  },
+  {
+    id: 'address',
+    numeric: false,
+    disablePadding: false,
+    label: 'Address',
   },
 ];
 
@@ -180,6 +181,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}
+              // onClick={(event) => readMember()}
               >
                 {headCell.label}
                 {orderBy === headCell.id ? (
@@ -226,11 +228,12 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
       ) : (
         <Typography
           sx={{ flex: '1 1 100%' }}
-          variant="h6"
+          align='left'
+          variant="h4"
           id="tableTitle"
           component="div"
         >
-          Members
+          Team Unyte
         </Typography>
       )}
       {numSelected > 0 ? (
@@ -241,9 +244,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         </Tooltip>
       ) : (
         <Tooltip title="Add member">
-          <Button style={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)' }} variant="contained" endIcon={<AddCircleIcon />}>
-            Add
-          </Button>
+          <AddMemberModal />
         </Tooltip>
       )}
     </Toolbar>
@@ -257,6 +258,33 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  // 配列に値をセットする形ではどう？rowsに合わせる
+  const [rows, setRows] = React.useState([""]);
+
+  async function readMember() {
+    const usersRef = collection(firebaseFirestore, "users");
+    // var arr: { [key: string]: string } = {};
+    var arr = [];
+    await getDocs(query(usersRef)).then((snapshot) => {
+      snapshot.forEach(async (doc: any) => {
+        // コメントを文字列に保存
+        // arr[i] = { address: doc.data().name, name: doc.data().address, role: doc.data().role };
+        // setRows([doc.data().name, doc.data().address, doc.data().role]);
+        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role))
+        // await setRows([...rows, createData(doc.data().address, doc.data().name, doc.data().role)]);
+        // console.log(arr[i]);
+        // setSpecialThxArr(doc.data().comment);
+      });
+    });
+    await setRows(arr);
+    // return (arr[0])
+  };
+
+  useEffect(() => {
+    console.log("毎回実行");
+    readMember();
+  }, []);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -365,8 +393,8 @@ export default function EnhancedTable() {
                       >
                         {row.name}
                       </TableCell>
-                      <TableCell>{row.address}</TableCell>
                       <TableCell>{row.role}</TableCell>
+                      <TableCell>{row.address}</TableCell>
                     </TableRow>
                   );
                 })}

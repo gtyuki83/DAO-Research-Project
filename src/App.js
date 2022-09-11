@@ -13,9 +13,11 @@ import Tasks from "./presentation/view_interfaces/Tasks.tsx";
 import TaskDetail from "./presentation/view_interfaces/TaskDetail.tsx";
 import MyPage from "./presentation/view_interfaces/MyPage.tsx";
 import CreateTask from "./presentation/view_interfaces/CreateTask.tsx";
+import Box from '@mui/material/Box';
 
 // MUI
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
+import SlideRoutes from 'react-slide-routes';
 
 const theme = createTheme({
   palette: {
@@ -41,18 +43,23 @@ function App() {
     <div>
       <ThemeProvider theme={theme}>
         <div className="App">
-          <BrowserRouter>
+          {/* <BrowserRouter> */}
+          <Box height="100vh" display="flex" flexDirection="column">
             <Header />
-            <Routes>
-              <Route path="/" element={<div>Home</div>} />
-              <Route path="/tasks" element={<Tasks />} />
-              <Route path="tasks/new" element={<CreateTask />} />
-              <Route path="/tasks/${taskId}" element={<TaskDetail />} />
-              <Route path="/proposals" element={<Proposals />} />
-              <Route path="/teams" element={<Teams />} />
-              <Route path="/mypage" element={<MyPage />} />
-            </Routes>
-          </BrowserRouter>
+            <Box flex={1} overflow="auto">
+              <SlideRoutes>
+                <Route path="/" element={<div>Home</div>} />
+                <Route exact path="/tasks" element={<Tasks />} />
+                <Route exact path="/tasks/:id" element={<TaskDetail />} />
+
+                {/* <Route path="tasks/new" element={<CreateTask />} /> */}
+                <Route path="/proposals" element={<Proposals />} />
+                <Route path="/teams" element={<Teams />} />
+                <Route path="/mypage" element={<MyPage />} />
+              </SlideRoutes>
+            </Box>
+          </Box>
+          {/* </BrowserRouter> */}
         </div >
       </ThemeProvider>
     </div>

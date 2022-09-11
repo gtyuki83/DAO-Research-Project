@@ -1,5 +1,9 @@
 import React from "react";
 import axios from 'axios';
+import { Slide } from '@mui/material';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 import TaskTable from "./TaskTable.tsx";
 
@@ -61,9 +65,11 @@ const Tasks = () => {
   //   console.log(data)
 
   // }
-  return <div>hoge
-    <span className="likeButton_plus" onClick={getNotionDatabaseData}>+
-    </span>
+
+  const [isDetail, setIsDetail] = React.useState(false);
+
+
+  return <div>
     <TaskTable />
   </div>;
 };

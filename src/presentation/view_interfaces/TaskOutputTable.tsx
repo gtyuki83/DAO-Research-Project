@@ -21,13 +21,32 @@ import { Link } from "react-router-dom";
 
 // Firebase関係
 import {
+  doc,
+  getDoc,
   collection,
   getDocs,
   query,
+  where,
 } from "firebase/firestore";
 import { firebaseFirestore } from "../../data/Firebase";
 
-import ProposalDetail from "./ProposalDetail.tsx";
+import Modal from '@mui/material/Modal';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import Tooltip from '@mui/material/Tooltip';
+
+const style = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  color: 'white',
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  background: 'linear-gradient(45deg, #ff7f50,#ff1493)',
+  boxShadow: 24,
+  p: 4,
+};
 
 const theme = createTheme({
   palette: {
@@ -49,7 +68,7 @@ const theme = createTheme({
 
 
 interface Column {
-  id: 'Title' | 'Priority' | 'Due' | 'Assigned' | 'CreatedBy' | 'Voting';
+  id: 'Link' | 'Description' | 'CreatedBy' | 'Accepted';
   label: string;
   minWidth?: number;
   align?: 'right';
@@ -57,16 +76,8 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: 'Title', label: 'Title' },
-  { id: 'Priority', label: 'Priority' },
-  {
-    id: 'Due',
-    label: 'Due',
-  },
-  {
-    id: 'Assigned',
-    label: 'Assigned',
-  },
+  { id: 'Link', label: 'Link' },
+  { id: 'Description', label: 'Description' },
   {
     id: 'CreatedBy',
     label: 'CreatedBy',
@@ -78,37 +89,35 @@ const columns: readonly Column[] = [
 ];
 
 interface Data {
-  Id: string;
-  Title: string;
-  Priority: string;
-  Due: string;
-  Assigned: string;
+  Link: string;
+  Description: string;
   CreatedBy: string;
   Accepted: boolean;
+  OutputId: string;
 }
 
 function createData(
-  Id: string,
-  Title: string,
-  Priority: string,
-  Due: string,
-  Assigned: string,
+  Link: string,
+  Description: string,
   CreatedBy: string,
   Accepted: boolean,
+  OutputId: string,
 ): Data {
-  return { Id, Title, Priority, Due, Assigned, CreatedBy, Accepted };
+  return { Link, Description, CreatedBy, Accepted, OutputId };
 }
 
-export default function StickyHeadTable() {
-  // const rows = [createData('プロダクト機能考案', '🔥High🔥', '8/13 17:00', '0xUWYZ', 'Yoshi')];
+export default function StickyHeadTable(taskid) {
   const [rows, setRows] = React.useState([]);
 
   async function readProposal() {
-    const proposalsRef = collection(firebaseFirestore, "proposals");
+    const outputsRef = collection(firebaseFirestore, "outputs");
+    const q = query(outputsRef, where("taskid", "==", taskid.taskid))
     var arr = [];
-    await getDocs(query(proposalsRef)).then((snapshot) => {
+    await getDocs(q).then((snapshot) => {
       snapshot.forEach(async (doc: any) => {
-        await arr.push(createData(doc.data().id, doc.data().title, doc.data().priority, doc.data().due.seconds.toString(), doc.data().assign, doc.data().createdBy, doc.data().accepted.toString()))
+        const link = doc.data().link.slice(0, 20) + "..."
+        const desc = doc.data().description.slice(0, 30) + "..."
+        await arr.push(createData(link, desc, doc.data().account, "False", doc.data().outputid))
       });
     });
     await setRows(arr);
@@ -129,6 +138,41 @@ export default function StickyHeadTable() {
     setPage(0);
   };
 
+  // モーダル処理と表示内容記載
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [outputId, setOutputId] = React.useState(null);
+  const [arr, setArr] = React.useState({});
+
+  const TaskOutputModal = () => {
+    const docRef = doc(firebaseFirestore, "outputs", "EW77C630mk9XeG7PVwX6");
+    const docSnap = getDoc(docRef);
+    // const link = docSnap.data().link
+    // const desc = docSnap.data().description
+    // setArr({ link: link, desc: desc, account: docSnap.data().account, state: "False", id: docSnap.data().outputid })
+    console.log(arr)
+
+    return (
+      <div>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Detail
+            </Typography>
+            {/* {arr.link} */}
+          </Box>
+        </Modal>
+      </div>
+    );
+  }
+  // モーダル処理と表示内容記載部分終わり
+
   return (
     <ThemeProvider theme={theme}>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -139,13 +183,15 @@ export default function StickyHeadTable() {
 
           <Typography
             sx={{ flex: '1 1 100%' }}
-            align='left'
+            align='center'
             variant="h4"
             id="tableTitle"
             component="div"
           >
-            Team Unyte
+            Outputs
           </Typography>
+
+          <TaskOutputModal></TaskOutputModal>
 
         </Toolbar >
         <TableContainer sx={{ maxHeight: 440 }}>
@@ -168,21 +214,18 @@ export default function StickyHeadTable() {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, i) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.Id} component={Link} to={`/tasks/${row.Id}`} style={{ textDecoration: 'none' }}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === 'number'
-                              ? column.format(value)
-                              : value}
-                          </TableCell>
-                        );
-                      })}
+                    <TableRow hover role="checkbox" tabIndex={-1} key={row['OutputId']} onClick={() => { handleOpen(); setOutputId(row['OutputId']); }} style={{ textDecoration: 'none' }}>
                       <TableCell>
-                        <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
-                          Detail
-                        </Button>
+                        {row['Link']}
+                      </TableCell>
+                      <TableCell>
+                        {row['Description']}
+                      </TableCell>
+                      <TableCell>
+                        {row['CreatedBy']}
+                      </TableCell>
+                      <TableCell>
+                        {row['Accepted']}
                       </TableCell>
                     </TableRow>
                   );
@@ -190,7 +233,7 @@ export default function StickyHeadTable() {
 
             </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer >
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
@@ -200,7 +243,7 @@ export default function StickyHeadTable() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Paper>
+      </Paper >
     </ThemeProvider >
   );
 }

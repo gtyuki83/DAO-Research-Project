@@ -19,47 +19,15 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
 
+import TeamModal from "./TeamModal.tsx";
+
 const Teams = () => {
   const hoge: string = "";
   const [addMember, setAddMember] = React.useState(true);
   const check = () => { }
   return <div>
+    <TeamModal></TeamModal>
     <TeamTable />
-    {addMember &&
-      <Box sx={{ width: '100%' }}>
-        <Paper sx={{ width: '100%', mb: 2 }}>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={'medium'}
-          ><TableCell padding="checkbox">
-              <Checkbox
-                color="primary"
-                checked={false}
-                // onChange={Check}
-                inputProps={{
-                  'aria-label': 'select all desserts',
-                }}
-              />
-            </TableCell>
-            <TableCell
-              component="th"
-              id={`enhanced-table-checkbox-1`}
-              scope="row"
-              padding="normal"
-            >
-              <TextField id="standard-basic" label="Name" variant="standard" />
-            </TableCell>
-            <TableCell>
-              <TextField id="standard-basic" label="Address" variant="standard" />
-            </TableCell>
-            <TableCell>
-              <TextField id="standard-basic" label="Role" variant="standard" />
-            </TableCell>
-          </Table>
-        </Paper>
-      </Box>
-    }
   </div >;
 };
 
