@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -13,16 +13,6 @@ import FormControl from '@mui/material/FormControl';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-
-import { AddProposal } from "./FirebaseAction.tsx";
-import CheckWallet from "../../data/blockchain_actions/checkWallet";
-// Firebase関係
-import {
-    collection,
-    getDocs,
-    query,
-} from "firebase/firestore";
-import { firebaseFirestore } from "../../data/Firebase";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -54,42 +44,30 @@ const priorities = [
     },
 ];
 
+const members = [
+    {
+        value: 'Yoshi',
+        label: 'Yoshi',
+    },
+    {
+        value: 'UYZ',
+        label: 'UYZ',
+    },
+    {
+        value: 'Funa',
+        label: 'Funa',
+    },
+    {
+        value: 'Everyone',
+        label: 'Everyone',
+    },
+];
 
-export default function ProposalModal() {
+
+export default function TeamModal() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-
-    const [members, setMember] = React.useState([]);
-    async function readMember() {
-        const usersRef = collection(firebaseFirestore, "users");
-        var arr = [];
-        await getDocs(query(usersRef)).then((snapshot) => {
-            snapshot.forEach(async (doc: any) => {
-                await arr.push({
-                    value: doc.data().name,
-                    label: doc.data().name,
-                })
-            });
-        });
-        await arr.push({
-            value: 'Everyone',
-            label: 'Everyone',
-        })
-        await setMember(arr);
-    };
-
-    const [title, setTitle] = React.useState('');
-
-    const handleTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(event.target.value);
-    };
-
-    const [description, setDescription] = React.useState('');
-
-    const handleDescription = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setDescription(event.target.value);
-    };
 
     const [priority, setPriority] = React.useState('Middle');
 
@@ -113,26 +91,12 @@ export default function ProposalModal() {
         setDate(newValue);
     };
 
-    const [currentAccount, setCurrentAccount] = useState(null);
-
-    useEffect(() => {
-        connect();
-        readMember();
-    }, []);
-
-    const connect = async () => {
-        CheckWallet().then(function (result) {
-            const address = result;
-            setCurrentAccount(address);
-        });
-    };
-
     return (
         <div>
             <Box display="flex" justifyContent="flex-end">
-                <Tooltip title="New Proposal">
+                <Tooltip title="New Team">
                     <Button onClick={handleOpen} style={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)' }} variant="contained" endIcon={<AddCircleIcon />}>
-                        New Proposal
+                        New Team
                     </Button>
                 </Tooltip>
             </Box>
@@ -148,14 +112,14 @@ export default function ProposalModal() {
                     </Typography>
                     <Box>
                         <FormControl fullWidth>
-                            <TextField id="fullWidth" label="Title" variant="outlined" value={title} onChange={handleTitle} />
+                            <TextField id="fullWidth" label="Title" variant="outlined" />
                         </FormControl>
                     </Box>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
 
                     </Typography>
                     <FormControl fullWidth>
-                        <TextField id="fullWidth" label="Description" variant="outlined" value={description} onChange={handleDescription} />
+                        <TextField id="fullWidth" label="Description" variant="outlined" />
                     </FormControl>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
 
@@ -204,15 +168,6 @@ export default function ProposalModal() {
                             renderInput={(params) => <TextField {...params} />}
                         />
                     </LocalizationProvider>
-
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}></Typography>
-
-                    <Button variant="contained" endIcon={<AddCircleIcon />} onClick={async () => {
-                        await AddProposal(title, description, priority, assign, date, currentAccount)
-                        await handleClose()
-                    }} >
-                        Add
-                    </Button>
                 </Box>
             </Modal>
         </div>

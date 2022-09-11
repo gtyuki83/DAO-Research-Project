@@ -28,16 +28,23 @@ export default function ButtonAppBar() {
 
   useEffect(() => {
     // CheckWallet();
-    connect();
+    check();
     // console.log(currentAccount)
-  }, []);
+  }, [currentAccount]);
 
   useEffect(() => {
     console.log(currentAccount);
   }, [currentAccount]);
 
-  const connect = async () => {
+  const connect = () => {
     Login().then(function (result) {
+      const address = result;
+      setCurrentAccount(address);
+    });
+  };
+
+  const check = () => {
+    CheckWallet().then(function (result) {
       const address = result;
       setCurrentAccount(address);
     });
@@ -65,12 +72,12 @@ export default function ButtonAppBar() {
             </Button>
           )}
           {!currentAccount && (
-            <Button color="inherit" onClick={connect}>
+            <Button color="inherit" onClick={() => connect()}>
               Login
             </Button>
           )}
         </Toolbar>
       </AppBar>
-    </div>
+    </div >
   );
 }

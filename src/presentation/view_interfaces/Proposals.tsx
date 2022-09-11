@@ -11,7 +11,6 @@ import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import ProposalTable from "./ProposalTable.tsx";
-import BasicModal from "./ProposalModal.tsx";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -66,14 +65,12 @@ const Proposal = () => {
   return <div>
     <CenteredTabs labels={['OnGoing (3)', 'Past (5)']}>
       <div>
-        <BasicModal></BasicModal>
-        <ProposalTable></ProposalTable>
+        <ProposalTable state='ongoing'></ProposalTable>
       </div>
       <div>
-        <BasicModal></BasicModal>
-        <ProposalTable></ProposalTable>
+        <ProposalTable state='past'></ProposalTable>
       </div>
-    </CenteredTabs>
+    </CenteredTabs >
   </div >;
 };
 

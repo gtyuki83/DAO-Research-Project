@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 
 export const Login = async () => {
     try {
-        console.log("a")
         const { ethereum } = window;
         if (!ethereum) {
             console.log("a")
@@ -11,7 +10,6 @@ export const Login = async () => {
             return;
         }
         // ウォレットアドレスに対してアクセスをリクエストしています。
-        console.log("a")
         const accounts = await ethereum.request({
             method: "eth_requestAccounts",
         });
