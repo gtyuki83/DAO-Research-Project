@@ -14,6 +14,10 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
+import { AddTeam } from "./FirebaseAction.tsx";
+import CheckWallet from "../../data/blockchain_actions/checkWallet";
+import { useEffect, useState } from 'react';
+
 const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -28,67 +32,31 @@ const style = {
     p: 4,
 };
 
-// Priority
-const priorities = [
-    {
-        value: 'High',
-        label: '🔥High🔥',
-    },
-    {
-        value: 'Middle',
-        label: 'Middle',
-    },
-    {
-        value: 'Low',
-        label: 'Low',
-    },
-];
-
-const members = [
-    {
-        value: 'Yoshi',
-        label: 'Yoshi',
-    },
-    {
-        value: 'UYZ',
-        label: 'UYZ',
-    },
-    {
-        value: 'Funa',
-        label: 'Funa',
-    },
-    {
-        value: 'Everyone',
-        label: 'Everyone',
-    },
-];
-
 
 export default function TeamModal() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const [priority, setPriority] = React.useState('Middle');
-
-    const handlePriority = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPriority(event.target.value);
+    const [name, setName] = React.useState("");
+    const handleName = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setName(event.target.value);
+    };
+    const [description, setDescription] = React.useState("");
+    const handleDescription = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setDescription(event.target.value);
     };
 
-    // Assign
-    const [assign, setAssign] = React.useState('');
+    const [currentAccount, setCurrentAccount] = useState(null);
+    useEffect(() => {
+        connect();
+    }, []);
 
-    const handleAssign = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAssign(event.target.value);
-    };
-
-    // Date
-    const [date, setDate] = React.useState<Date | null>(
-        new Date(''),
-    );
-
-    const handleDate = (newValue: Date | null) => {
-        setDate(newValue);
+    const connect = async () => {
+        CheckWallet().then(function (result) {
+            const address = result;
+            setCurrentAccount(address);
+        });
     };
 
     return (
@@ -108,66 +76,30 @@ export default function TeamModal() {
             >
                 <Box sx={style}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        New Proposal
+                        Create New Team
                     </Typography>
                     <Box>
                         <FormControl fullWidth>
-                            <TextField id="fullWidth" label="Title" variant="outlined" />
+                            <TextField id="fullWidth" label="Name" variant="outlined" value={name} onChange={handleName} />
                         </FormControl>
                     </Box>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
 
                     </Typography>
                     <FormControl fullWidth>
-                        <TextField id="fullWidth" label="Description" variant="outlined" />
+                        <TextField id="fullWidth" label="Description(optional)" variant="outlined" value={description} onChange={handleDescription} />
                     </FormControl>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
 
                     </Typography>
 
-                    <TextField
-                        id="outlined-select-currency"
-                        select
-                        label="Priority"
-                        value={priority}
-                        onChange={handlePriority}
-                        helperText="Please select the priority of this task"
-                    >
-                        {priorities.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+                    <Button variant="contained" endIcon={<AddCircleIcon />} onClick={async () => {
+                        await AddTeam(name, description, currentAccount)
+                        await handleClose()
+                    }} >
+                        Create
+                    </Button>
 
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}></Typography>
-
-                    <TextField
-                        id="outlined-select-currency"
-                        select
-                        label="Assign"
-                        value={assign}
-                        onChange={handleAssign}
-                        helperText="Please select who to assign the task"
-                    >
-                        {members.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}></Typography>
-
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DesktopDatePicker
-                            label="Due"
-                            inputFormat="MM/dd/yyyy"
-                            value={date}
-                            onChange={handleDate}
-                            renderInput={(params) => <TextField {...params} />}
-                        />
-                    </LocalizationProvider>
                 </Box>
             </Modal>
         </div>

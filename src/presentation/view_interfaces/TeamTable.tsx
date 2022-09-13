@@ -17,12 +17,19 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { visuallyHidden } from '@mui/utils';
+import Button from '@mui/material/Button';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+// リンクへのアクセス
+import { Link } from "react-router-dom";
 
 // Firebase関係
 import {
+  doc,
   collection,
+  getDoc,
   getDocs,
   query,
+  where,
 } from "firebase/firestore";
 import { firebaseFirestore } from "../../data/Firebase";
 
@@ -32,7 +39,9 @@ import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import AddMemberModal from "./AddMemberModal.tsx";
+import CheckWallet from "../../data/blockchain_actions/checkWallet";
 import { useEffect, useState } from 'react';
+import { async } from './FirebaseAction';
 
 const theme = createTheme({
   palette: {
@@ -56,18 +65,21 @@ interface Data {
   address: string;
   name: string;
   role: string;
+  id: string;
 }
 
 function createData(
   address: string,
   name: string,
   role: string,
+  id: string,
 ): Data {
 
   return {
     address,
     name,
     role,
+    id,
   };
 }
 
@@ -181,7 +193,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}
-              // onClick={(event) => readMember()}
               >
                 {headCell.label}
                 {orderBy === headCell.id ? (
@@ -192,6 +203,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
               </TableSortLabel>
             </TableCell>
           ))}
+          <TableCell></TableCell>
         </TableRow>
       </TableHead>
     </ThemeProvider>
@@ -204,49 +216,27 @@ interface EnhancedTableToolbarProps {
 
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const { numSelected } = props;
+  const { teamName } = props;
 
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        }),
       }}
     >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          align='left'
-          variant="h4"
-          id="tableTitle"
-          component="div"
-        >
-          Team Unyte
-        </Typography>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Add member">
-          <AddMemberModal />
-        </Tooltip>
-      )}
+      <Typography
+        sx={{ flex: '1 1 100%' }}
+        align='left'
+        variant="h4"
+        id="tableTitle"
+        component="div"
+      >
+        Team {teamName}
+      </Typography>
+      <Tooltip title="Add member">
+        <AddMemberModal />
+      </Tooltip>
     </Toolbar>
   );
 };
@@ -258,23 +248,18 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [team, setTeam] = React.useState([]);
 
   // 配列に値をセットする形ではどう？rowsに合わせる
   const [rows, setRows] = React.useState([""]);
 
   async function readMember() {
     const usersRef = collection(firebaseFirestore, "users");
-    // var arr: { [key: string]: string } = {};
     var arr = [];
     await getDocs(query(usersRef)).then((snapshot) => {
       snapshot.forEach(async (doc: any) => {
         // コメントを文字列に保存
-        // arr[i] = { address: doc.data().name, name: doc.data().address, role: doc.data().role };
-        // setRows([doc.data().name, doc.data().address, doc.data().role]);
-        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role))
-        // await setRows([...rows, createData(doc.data().address, doc.data().name, doc.data().role)]);
-        // console.log(arr[i]);
-        // setSpecialThxArr(doc.data().comment);
+        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id))
       });
     });
     await setRows(arr);
@@ -282,7 +267,7 @@ export default function EnhancedTable() {
   };
 
   useEffect(() => {
-    console.log("毎回実行");
+    // console.log("毎回実行");
     readMember();
   }, []);
 
@@ -305,23 +290,6 @@ export default function EnhancedTable() {
   };
 
   const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -339,87 +307,134 @@ export default function EnhancedTable() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
+  // ユーザーのウォレットアドレス取得
+  const [currentAccount, setCurrentAccount] = useState(null);
+  useEffect(() => {
+    connect();
+  }, []);
+
+  const connect = async () => {
+    CheckWallet().then(function (result) {
+      const address = result;
+      setCurrentAccount(address);
+    });
+  };
+  // アクセスしたユーザーのアドレスから、チーム一覧を取得してコンソールに表示
+  const readTeams = async (address) => {
+    const usersRef = collection(firebaseFirestore, "users");
+    const snapshot = await getDocs(query(usersRef, where("address", "==", address)));
+    const arr = [];
+    snapshot.forEach(async (document) => {
+      document.data().team.map(async (te) => {
+        //　IDがteのチームを探す
+        const docSnap = await getDoc(doc(firebaseFirestore, "teams", te));
+        if (docSnap.exists()) {
+          arr.push({
+            name: docSnap.data().name,
+            id: docSnap.data().id,
+          });
+        } else {
+          // console.log("No such document!");
+        }
+        await setTeam(arr);
+      })
+    });
+  };
+
+  useEffect(() => {
+    readTeams(currentAccount);
+  }, [currentAccount]);
+
   return (
     <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {/* if you don't need to support IE11, you can replace the `stableSort` call with:
+      {team.map((tea, index) => {
+        return (
+          <Paper sx={{ width: '100%', mb: 2 }}>
+            <EnhancedTableToolbar numSelected={selected.length} teamName={tea.name} />
+            <TableContainer>
+              <Table
+                sx={{ minWidth: 750 }}
+                aria-labelledby="tableTitle"
+                size={dense ? 'small' : 'medium'}
+              >
+                <EnhancedTableHead
+                  numSelected={selected.length}
+                  order={order}
+                  orderBy={orderBy}
+                  onSelectAllClick={handleSelectAllClick}
+                  onRequestSort={handleRequestSort}
+                  rowCount={rows.length}
+                />
+                <TableBody>
+                  {/* if you don't need to support IE11, you can replace the `stableSort` call with:
               rows.slice().sort(getComparator(order, orderBy)) */}
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                  {stableSort(rows, getComparator(order, orderBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      const isItemSelected = isSelected(row.name);
+                      const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
+                      return (
+                        <TableRow
+                          hover
+                          onClick={(event) => handleClick(event, row.name)}
+                          role="checkbox"
+                          aria-checked={isItemSelected}
+                          tabIndex={-1}
+                          key={row.name}
+                          selected={isItemSelected}
+                        >
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              color="primary"
+                              checked={isItemSelected}
+                              inputProps={{
+                                'aria-labelledby': labelId,
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell
+                            component="th"
+                            id={labelId}
+                            scope="row"
+                            padding="normal"
+                          >
+                            {row.name}
+                          </TableCell>
+                          <TableCell>{row.role}</TableCell>
+                          <TableCell>{row.address}</TableCell>
+                          <TableCell align='right'>
+                            <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/teams/${tea.id}/${row.id}`} >
+                              Comment
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {emptyRows > 0 && (
                     <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.name)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.name}
-                      selected={isItemSelected}
+                      style={{
+                        height: (dense ? 33 : 53) * emptyRows,
+                      }}
                     >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="normal"
-                      >
-                        {row.name}
-                      </TableCell>
-                      <TableCell>{row.role}</TableCell>
-                      <TableCell>{row.address}</TableCell>
+                      <TableCell colSpan={6} />
                     </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+        )
+      })}
     </Box>
   );
 }

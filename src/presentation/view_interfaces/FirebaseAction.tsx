@@ -4,14 +4,17 @@ import {
     doc,
     setDoc,
     collection,
+    getDoc,
     getDocs,
     query,
     where,
     updateDoc,
+    arrayUnion,
 } from "firebase/firestore";
 import { firebaseFirestore } from "../../data/Firebase";
 
 export function AddMember(name, address, role) {
+    // ↑ここの引数でteam名をもらうように処理変更予定
     try {
         if (name != "" && address != "") {
             const usersRef = collection(firebaseFirestore, "users");
@@ -20,7 +23,7 @@ export function AddMember(name, address, role) {
                 name: name,
                 address: address.toLowerCase(),
                 role: role,
-                team: "Unyte",
+                team: ['Unyte'],
                 id: newDoc,
             });
             alert("成功！");
@@ -71,6 +74,62 @@ export function SubmitOutput(description, link, account, id) {
                 description: description,
                 taskid: id,
                 outputid: newDoc,
+            });
+            alert("成功！");
+        } else {
+            alert("空の値があります🥺");
+        }
+    } catch (error) { }
+};
+
+export async function AddTeam(name, description, address) {
+    try {
+        if (name != "" && address != "") {
+            // チームを追加
+            const teamsRef = collection(firebaseFirestore, "teams");
+            const newDoc = doc(teamsRef).id;
+            const documentRef = await setDoc(doc(teamsRef, newDoc), {
+                name: name,
+                description: description,
+                owneraddress: address,
+                id: newDoc,
+            });
+            // オーナーの参加チーム一覧に今回のチームを追加(id単位)
+            const usersRef = collection(firebaseFirestore, "users");
+            // owneraddressとアドレスが一致するuserアカウントを取得
+            // await getDocs(query(usersRef, where("address", "==", address))).then(snapshot => {
+            const snapshot = await getDocs(query(usersRef, where("address", "==", address)));
+            console.log(snapshot)
+            snapshot.forEach(async (document) => {
+                console.log(`${document.id}: ${document.data().name} `);
+                console.log(document.data());
+                const docSnap = doc(firebaseFirestore, "users", "yE31Lilx1dPBXPLZKCMo");
+                console.log(docSnap);
+                // 参加済チームに今回のチームidを追加
+                const docSna = await updateDoc(docSnap, {
+                    team: arrayUnion(newDoc)
+                });
+                console.log(newDoc);
+            });
+            // })
+            alert("成功！");
+        } else {
+            alert("チーム名を入力してください🥺");
+        }
+    } catch (error) { }
+};
+
+export function SubmitComment(teamid, from, to, comment) {
+    try {
+        if (teamid != "" && from != "" && to != "" && comment != "") {
+            const commentsRef = collection(firebaseFirestore, "comments");
+            const newDoc = doc(commentsRef).id;
+            const documentRef = setDoc(doc(commentsRef, newDoc), {
+                teamid: teamid,
+                from: from,
+                comment: comment,
+                to: to,
+                id: newDoc,
             });
             alert("成功！");
         } else {

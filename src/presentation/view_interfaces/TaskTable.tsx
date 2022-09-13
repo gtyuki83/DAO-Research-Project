@@ -108,7 +108,9 @@ export default function StickyHeadTable() {
     var arr = [];
     await getDocs(query(proposalsRef)).then((snapshot) => {
       snapshot.forEach(async (doc: any) => {
-        await arr.push(createData(doc.data().id, doc.data().title, doc.data().priority, doc.data().due.seconds.toString(), doc.data().assign, doc.data().createdBy, doc.data().accepted.toString()))
+        const time = new Date(doc.data().due.seconds * 1000);
+        const dateTime = time.getFullYear().toString() + "/" + (time.getMonth() + 1).toString() + "/" + time.getDate().toString();
+        await arr.push(createData(doc.data().id, doc.data().title, doc.data().priority, dateTime, doc.data().assign, doc.data().createdBy, doc.data().accepted.toString()))
       });
     });
     await setRows(arr);
@@ -161,6 +163,7 @@ export default function StickyHeadTable() {
                     {column.label}
                   </TableCell>
                 ))}
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
