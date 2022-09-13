@@ -8,6 +8,7 @@ import "./presentation/view_interfaces/styles/index.styl";
 import "./presentation/view_interfaces/styles/App.css";
 import Header from "./presentation/view_interfaces/components/Header";
 import Teams from "./presentation/view_interfaces/Teams.tsx";
+import TeamComments from "./presentation/view_interfaces/TeamComments.tsx";
 import Proposals from "./presentation/view_interfaces/Proposals.tsx";
 import Tasks from "./presentation/view_interfaces/Tasks.tsx";
 import TaskDetail from "./presentation/view_interfaces/TaskDetail.tsx";
@@ -51,10 +52,9 @@ function App() {
                 <Route path="/" element={<div>Home</div>} />
                 <Route exact path="/tasks" element={<Tasks />} />
                 <Route exact path="/tasks/:id" element={<TaskDetail />} />
-
-                {/* <Route path="tasks/new" element={<CreateTask />} /> */}
                 <Route path="/proposals" element={<Proposals />} />
-                <Route path="/teams" element={<Teams />} />
+                <Route exact path="/teams" element={<Teams />} />
+                <Route exact path="/teams/:teamid/:userid" element={<TeamComments />} />
                 <Route path="/mypage" element={<MyPage />} />
               </SlideRoutes>
             </Box>
