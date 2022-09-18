@@ -20,6 +20,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
@@ -41,6 +42,20 @@ import {
   where,
 } from "firebase/firestore";
 import { firebaseFirestore } from "../../data/Firebase";
+
+const style = {
+  // position: 'absolute' as 'absolute',
+  // top: '50%',
+  // left: '50%',
+  // transform: 'translate(-50%, -50%)',
+  // width: 600,
+  color: 'white',
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  background: 'linear-gradient(45deg, #ff7f50,#ff1493)',
+  boxShadow: 24,
+  p: 2,
+};
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -193,21 +208,48 @@ const MyPage = (props) => {
     </Stack>
     <CenteredTabs labels={['Proposals (3)', 'Submitted (5)', 'Admired (4)']}>
       <div>
-        Earned：160 PSL
-        <br />
-        Great!
+        <Box sx={style}>
+          <Typography
+            sx={{ flex: '1 1 100%' }}
+            align='center'
+            variant="h6"
+            component="div"
+          >
+            Earned：160 PSL
+            <br />
+            Great!
+          </Typography>
+        </Box>
         <TaskTable />
       </div>
       <div>
-        Earned：240 SMT
-        <br />
-        Good!
+        <Box sx={style}>
+          <Typography
+            sx={{ flex: '1 1 100%' }}
+            align='center'
+            variant="h6"
+            component="div"
+          >
+            Earned：240 SMT
+            <br />
+            Good!
+          </Typography>
+        </Box>
         <TaskTable />
       </div>
       <div>
-        Earned：200 ADM
-        <br />
-        Nice!
+        <Box sx={style}>
+          <Typography
+            sx={{ flex: '1 1 100%' }}
+            align='center'
+            variant="h6"
+            component="div"
+          >
+            Earned：200 ADM
+            <br />
+            Nice!
+          </Typography>
+        </Box>
         <TaskTable />
       </div>
     </CenteredTabs>

@@ -41,7 +41,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import AddMemberModal from "./AddMemberModal.tsx";
 import CheckWallet from "../../data/blockchain_actions/checkWallet";
 import { useEffect, useState } from 'react';
-import { async } from './FirebaseAction';
+// import { async } from './FirebaseAction';
 
 const theme = createTheme({
   palette: {

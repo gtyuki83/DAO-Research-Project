@@ -13,7 +13,23 @@ import {
 } from "firebase/firestore";
 import { firebaseFirestore } from "../../data/Firebase";
 
-export function AddMember(name, address, role) {
+export async function AddMember(name, address, role) {
+    // アドレスが既に存在するか検索
+    const usersRef = collection(firebaseFirestore, "users");
+    const snapshot = await getDocs(query(usersRef, where("address", "==", address)));
+    // アドレスがあればTeamに該当のものを追加、なければユーザーを追加しTeam追加
+    console.log(snapshot)
+    snapshot.forEach(async (document) => {
+        console.log(`${document.id}: ${document.data().name} `);
+        console.log(document.data());
+        const docSnap = doc(firebaseFirestore, "users", "yE31Lilx1dPBXPLZKCMo");
+        console.log(docSnap);
+        // 参加済チームに今回のチームidを追加
+        const docSna = await updateDoc(docSnap, {
+            team: arrayUnion(newDoc)
+        });
+        console.log(newDoc);
+    });
     // ↑ここの引数でteam名をもらうように処理変更予定
     try {
         if (name != "" && address != "") {
