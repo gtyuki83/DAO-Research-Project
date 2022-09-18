@@ -14,6 +14,7 @@ import Tasks from "./presentation/view_interfaces/Tasks.tsx";
 import TaskDetail from "./presentation/view_interfaces/TaskDetail.tsx";
 import MyPage from "./presentation/view_interfaces/MyPage.tsx";
 import CreateTask from "./presentation/view_interfaces/CreateTask.tsx";
+import Token from "./presentation/view_interfaces/Token.tsx";
 import Box from '@mui/material/Box';
 
 // MUI
@@ -49,7 +50,7 @@ function App() {
             <Header />
             <Box flex={1} overflow="auto">
               <SlideRoutes>
-                <Route path="/" element={<div>Home</div>} />
+                <Route path="/" element={<Token />} />
                 <Route exact path="/tasks" element={<Tasks />} />
                 <Route exact path="/tasks/:id" element={<TaskDetail />} />
                 <Route path="/proposals" element={<Proposals />} />

@@ -170,25 +170,27 @@ export default function StickyHeadTable() {
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, i) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.Id} component={Link} to={`/tasks/${row.Id}`} style={{ textDecoration: 'none' }}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === 'number'
-                              ? column.format(value)
-                              : value}
-                          </TableCell>
-                        );
-                      })}
-                      <TableCell>
-                        <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
-                          Detail
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
+                  if (row.Accepted === "true") {
+                    return (
+                      <TableRow hover role="checkbox" tabIndex={-1} key={row.Id} component={Link} to={`/tasks/${row.Id}`} style={{ textDecoration: 'none' }}>
+                        {columns.map((column) => {
+                          const value = row[column.id];
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {column.format && typeof value === 'number'
+                                ? column.format(value)
+                                : value}
+                            </TableCell>
+                          );
+                        })}
+                        <TableCell>
+                          <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
+                            Detail
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
                 })}
 
             </TableBody>

@@ -166,6 +166,7 @@ export default function ProposalTable(state) {
                     {column.label}
                   </TableCell>
                 ))}
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
