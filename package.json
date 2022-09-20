@@ -17,6 +17,7 @@
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "date-fns": "^2.29.2",
+    "eslint": "^8.23.1",
     "eslint-config-react-app": "^7.0.1",
     "ethers": "^5.7.1",
     "firebase": "^9.9.4",
