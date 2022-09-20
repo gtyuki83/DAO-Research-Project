@@ -11,13 +11,10 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
 import { useEffect, useState } from 'react';
-// リンクへのアクセス
-import { Link } from "react-router-dom";
 
 // Firebase関係
 import {
@@ -26,10 +23,13 @@ import {
   getDocs,
   query,
   where,
-  getDoc
+  getDoc,
 } from "firebase/firestore";
 import { firebaseFirestore } from "../../data/Firebase";
 
+import ProposalDetail from "./ProposalDetail.tsx";
+import ProposalModal from "./ProposalModal.tsx";
+import Proposal from './Proposals';
 import CheckWallet from "../../data/blockchain_actions/checkWallet";
 
 const theme = createTheme({
@@ -52,7 +52,7 @@ const theme = createTheme({
 
 
 interface Column {
-  id: 'Title' | 'Priority' | 'Due' | 'Assigned' | 'CreatedBy' | 'Voting';
+  id: 'Link' | 'Description' | 'CreatedBy' | 'Accepted';
   label: string;
   minWidth?: number;
   align?: 'right';
@@ -60,16 +60,8 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: 'Title', label: 'Title' },
-  { id: 'Priority', label: 'Priority' },
-  {
-    id: 'Due',
-    label: 'Due',
-  },
-  {
-    id: 'Assigned',
-    label: 'Assigned',
-  },
+  { id: 'Link', label: 'Link' },
+  { id: 'Description', label: 'Description' },
   {
     id: 'CreatedBy',
     label: 'CreatedBy',
@@ -81,60 +73,41 @@ const columns: readonly Column[] = [
 ];
 
 interface Data {
-  Id: string;
-  Title: string;
-  Priority: string;
-  Due: string;
-  Assigned: string;
+  Link: string;
+  Description: string;
   CreatedBy: string;
   Accepted: boolean;
+  OutputId: string;
   Team: string;
 }
 
 function createData(
-  Id: string,
-  Title: string,
-  Priority: string,
-  Due: string,
-  Assigned: string,
+  Link: string,
+  Description: string,
   CreatedBy: string,
   Accepted: boolean,
+  OutputId: string,
   Team: string,
 ): Data {
-  return { Id, Title, Priority, Due, Assigned, CreatedBy, Accepted, Team };
+  return { Link, Description, CreatedBy, Accepted, OutputId, Team };
 }
 
-export default function StickyHeadTable() {
-  // const rows = [createData('プロダクト機能考案', '🔥High🔥', '8/13 17:00', '0xUWYZ', 'Yoshi')];
+export default function MyProposalTable() {
   const [rows, setRows] = React.useState([]);
   const [team, setTeam] = React.useState([]);
 
-  async function readProposal() {
-    const proposalsRef = collection(firebaseFirestore, "proposals");
+  async function readProposal(address) {
+    const outputsRef = collection(firebaseFirestore, "outputs");
+    const q = query(outputsRef, where("account", "==", address.toLowerCase()))
     var arr = [];
-    await getDocs(query(proposalsRef)).then((snapshot) => {
+    await getDocs(q).then((snapshot) => {
       snapshot.forEach(async (doc: any) => {
-        const time = new Date(doc.data().due.seconds * 1000);
-        const dateTime = time.getFullYear().toString() + "/" + (time.getMonth() + 1).toString() + "/" + time.getDate().toString();
-        await arr.push(createData(doc.data().id, doc.data().title, doc.data().priority, dateTime, doc.data().assign, doc.data().createdBy, doc.data().accepted.toString(), doc.data().team))
+        const link = doc.data().link.slice(0, 20) + "..."
+        const desc = doc.data().description.slice(0, 30) + "..."
+        await arr.push(createData(link, desc, doc.data().account, "False", doc.data().outputid, doc.data().team))
       });
     });
     await setRows(arr);
-  };
-  useEffect(() => {
-    readProposal();
-  }, []);
-
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
   };
 
   // ユーザーのウォレットアドレス取得
@@ -147,7 +120,24 @@ export default function StickyHeadTable() {
     CheckWallet().then(function (result) {
       const address = result;
       setCurrentAccount(address);
+      readProposal(address);
     });
+  };
+
+  // useEffect(() => {
+  //   readProposal();
+  // }, []);
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
   };
 
   // アクセスしたユーザーのアドレスから、チーム一覧を取得してコンソールに表示
@@ -196,6 +186,8 @@ export default function StickyHeadTable() {
                 Team {tea.name}
               </Typography>
 
+              {/* <ProposalModal></ProposalModal> */}
+
             </Toolbar >
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table stickyHeader aria-label="sticky table" >
@@ -214,31 +206,32 @@ export default function StickyHeadTable() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, i) => {
-                      if (row.Accepted === "true" && row.Team === tea.id) {
-                        return (
-                          <TableRow hover role="checkbox" tabIndex={-1} key={row.Id} component={Link} to={`/tasks/${row.Id}`} style={{ textDecoration: 'none' }}>
-                            {columns.map((column) => {
-                              const value = row[column.id];
-                              return (
-                                <TableCell key={column.id} align={column.align}>
-                                  {column.format && typeof value === 'number'
-                                    ? column.format(value)
-                                    : value}
-                                </TableCell>
-                              );
-                            })}
-                            <TableCell>
-                              <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
-                                Detail
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      }
-                    })}
+                  {
+                    rows
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row, i) => {
+                        // ここで適当な変数を変える処理を入れておけば、Useeffectを叩くと再描画できそう
+                        if (row.Team === tea.id) {
+                          return (
+                            <TableRow hover role="checkbox" tabIndex={-1} key={row.Id}>
+                              {columns.map((column) => {
+                                const value = row[column.id];
+                                return (
+                                  <TableCell key={column.id} align={column.align}>
+                                    {column.format && typeof value === 'number'
+                                      ? column.format(value)
+                                      : value}
+                                  </TableCell>
+                                );
+                              })}
+                              <TableCell>
+                                <ProposalDetail id={row.Id} />
+                              </TableCell>
+                            </TableRow>
+                          );
+                        }
+                      })
+                  }
 
                 </TableBody>
               </Table>

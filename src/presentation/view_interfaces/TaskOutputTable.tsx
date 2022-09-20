@@ -173,15 +173,6 @@ export default function StickyHeadTable(taskid) {
   }, [outputId]);
 
   const TaskOutputModal = () => {
-    // async function readOutput() {
-    //   const docRef = doc(firebaseFirestore, "outputs", "EW77C630mk9XeG7PVwX6");
-    //   const docSnap = await getDoc(docRef);
-    //   const link = docSnap.data().link
-    //   const desc = docSnap.data().description
-    //   await setArr({ link: link, desc: desc, account: docSnap.data().account, state: "False", id: docSnap.data().outputid })
-    // };
-    // func.then(() => console.log(arr))
-    // console.log(Promise.resolve(arr))
 
     return (
       <div>

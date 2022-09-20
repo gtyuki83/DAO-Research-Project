@@ -31,6 +31,10 @@ import { AccountCircle, AccessAlarm, ThreeDRotation, AccountBalanceWallet } from
 
 import TaskTable from "./TaskTable.tsx";
 import CheckWallet from "../../data/blockchain_actions/checkWallet";
+import MyProposalTable from "./MyProposalTable.tsx";
+import MyTaskTable from "./MyTaskTable.tsx";
+import MyCommentTable from "./MyCommentTable.tsx";
+import { countActivity } from "./FirebaseAction.tsx";
 
 // Firebase関係
 import {
@@ -91,6 +95,12 @@ function createData(
 
 
 const MyPage = (props) => {
+  // 各アクティビティの実績数を取得する状態変数
+  const [activity, setActivity] = React.useState({
+    "proposals": 0,
+    "tasks": 0,
+    "comments": 0,
+  });
   const hoge: string = "";
 
   const CenteredTabs = (props) => {
@@ -134,6 +144,13 @@ const MyPage = (props) => {
     CheckWallet().then(function (result) {
       const address = result;
       setCurrentAccount(address);
+      countActivity(address).then(function (result) {
+        setActivity({
+          "proposals": result[0],
+          "tasks": result[1],
+          "comments": result[2],
+        })
+      })
     });
   };
 
@@ -206,7 +223,7 @@ const MyPage = (props) => {
       <Chip label="#PolygonTokyoHack" color="primary" variant="outlined" onClick={handleClick} />
       <Chip label="#ETHOnline" color="primary" variant="outlined" onClick={handleClick} />
     </Stack>
-    <CenteredTabs labels={['Proposals (3)', 'Submitted (5)', 'Admired (4)']}>
+    <CenteredTabs labels={[`Proposal(${activity.proposals})`, `Tasks(${activity.tasks})`, `comments(${activity.comments})`]}>
       <div>
         <Box sx={style}>
           <Typography
@@ -215,12 +232,12 @@ const MyPage = (props) => {
             variant="h6"
             component="div"
           >
-            Earned：160 PSL
+            Earned：{`${activity.proposals * 30}`} PSL
             <br />
             Great!
           </Typography>
         </Box>
-        <TaskTable />
+        <MyProposalTable />
       </div>
       <div>
         <Box sx={style}>
@@ -230,12 +247,12 @@ const MyPage = (props) => {
             variant="h6"
             component="div"
           >
-            Earned：240 SMT
+            Earned：{`${activity.tasks * 30}`} SMT
             <br />
             Good!
           </Typography>
         </Box>
-        <TaskTable />
+        <MyTaskTable />
       </div>
       <div>
         <Box sx={style}>
@@ -245,12 +262,12 @@ const MyPage = (props) => {
             variant="h6"
             component="div"
           >
-            Earned：200 ADM
+            Earned：{`${activity.comments * 30}`} ADM
             <br />
             Nice!
           </Typography>
         </Box>
-        <TaskTable />
+        <MyCommentTable />
       </div>
     </CenteredTabs>
   </div >;

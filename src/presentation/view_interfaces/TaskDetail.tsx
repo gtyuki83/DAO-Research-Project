@@ -57,6 +57,7 @@ const TaskDetail = () => {
     priority: '',
     description: '',
     createdBy: '',
+    team: '',
   });
 
   async function readProposal() {
@@ -70,6 +71,7 @@ const TaskDetail = () => {
         priority: docSnap.data().priority,
         description: docSnap.data().description,
         createdBy: docSnap.data().createdBy,
+        team: docSnap.data().team,
       });
     } else {
       console.log("No such document!");
@@ -146,7 +148,7 @@ const TaskDetail = () => {
             <TextField multiline maxRows={5} id="fullWidth" label="Description" variant="outlined" value={description} onChange={handleDescription} />
           </FormControl>
         </Typography>
-        <Button onClick={() => SubmitOutput(description, output, currentAccount, id)} style={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)' }} variant="contained" endIcon={<AddCircleIcon />} margin="normal">
+        <Button onClick={() => SubmitOutput(description, output, currentAccount, id, data.team)} style={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)' }} variant="contained" endIcon={<AddCircleIcon />} margin="normal">
           Submit
         </Button>
       </Box>

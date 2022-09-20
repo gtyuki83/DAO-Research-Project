@@ -66,6 +66,7 @@ interface Data {
   name: string;
   role: string;
   id: string;
+  team: array;
 }
 
 function createData(
@@ -73,6 +74,7 @@ function createData(
   name: string,
   role: string,
   id: string,
+  team: array,
 ): Data {
 
   return {
@@ -80,6 +82,7 @@ function createData(
     name,
     role,
     id,
+    team,
   };
 }
 
@@ -217,6 +220,7 @@ interface EnhancedTableToolbarProps {
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const { numSelected } = props;
   const { teamName } = props;
+  const { teamId } = props;
 
   return (
     <Toolbar
@@ -235,7 +239,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         Team {teamName}
       </Typography>
       <Tooltip title="Add member">
-        <AddMemberModal />
+        <AddMemberModal teamId={teamId} />
       </Tooltip>
     </Toolbar>
   );
@@ -259,10 +263,11 @@ export default function EnhancedTable() {
     await getDocs(query(usersRef)).then((snapshot) => {
       snapshot.forEach(async (doc: any) => {
         // コメントを文字列に保存
-        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id))
+        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id, doc.data().team))
       });
     });
     await setRows(arr);
+    // console.log(arr)
     // return (arr[0])
   };
 
@@ -350,7 +355,7 @@ export default function EnhancedTable() {
       {team.map((tea, index) => {
         return (
           <Paper sx={{ width: '100%', mb: 2 }}>
-            <EnhancedTableToolbar numSelected={selected.length} teamName={tea.name} />
+            <EnhancedTableToolbar numSelected={selected.length} teamName={tea.name} teamId={tea.id} />
             <TableContainer>
               <Table
                 sx={{ minWidth: 750 }}
@@ -374,42 +379,45 @@ export default function EnhancedTable() {
                       const isItemSelected = isSelected(row.name);
                       const labelId = `enhanced-table-checkbox-${index}`;
 
-                      return (
-                        <TableRow
-                          hover
-                          onClick={(event) => handleClick(event, row.name)}
-                          role="checkbox"
-                          aria-checked={isItemSelected}
-                          tabIndex={-1}
-                          key={row.name}
-                          selected={isItemSelected}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              color="primary"
-                              checked={isItemSelected}
-                              inputProps={{
-                                'aria-labelledby': labelId,
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell
-                            component="th"
-                            id={labelId}
-                            scope="row"
-                            padding="normal"
+                      // チーム所属メンバーのみ表示
+                      if (row.team.includes(tea.id)) {
+                        return (
+                          <TableRow
+                            hover
+                            onClick={(event) => handleClick(event, row.name)}
+                            role="checkbox"
+                            aria-checked={isItemSelected}
+                            tabIndex={-1}
+                            key={row.name}
+                            selected={isItemSelected}
                           >
-                            {row.name}
-                          </TableCell>
-                          <TableCell>{row.role}</TableCell>
-                          <TableCell>{row.address}</TableCell>
-                          <TableCell align='right'>
-                            <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/teams/${tea.id}/${row.id}`} >
-                              Comment
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                color="primary"
+                                checked={isItemSelected}
+                                inputProps={{
+                                  'aria-labelledby': labelId,
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell
+                              component="th"
+                              id={labelId}
+                              scope="row"
+                              padding="normal"
+                            >
+                              {row.name}
+                            </TableCell>
+                            <TableCell>{row.role}</TableCell>
+                            <TableCell>{row.address}</TableCell>
+                            <TableCell align='right'>
+                              <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/teams/${tea.id}/${row.id}`} >
+                                Comment
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
                     })}
                   {emptyRows > 0 && (
                     <TableRow

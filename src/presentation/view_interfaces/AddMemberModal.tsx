@@ -48,7 +48,7 @@ const roles = [
 
 
 
-export default function AddMemberModal() {
+export default function AddMemberModal(props) {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -126,7 +126,7 @@ export default function AddMemberModal() {
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}></Typography>
 
                     <Button variant="contained" endIcon={<AddCircleIcon />} onClick={() => {
-                        AddMember(name, address, role);
+                        AddMember(name, address, role, props.teamId);
                     }} >
                         Add
                     </Button>

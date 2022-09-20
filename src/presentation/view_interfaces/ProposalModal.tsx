@@ -54,31 +54,23 @@ const priorities = [
     },
 ];
 
+// Member of getting token
+const members = [
+    {
+        value: 'only 1 winner',
+        label: 'only 1 winner',
+    },
+    {
+        value: 'Everyone',
+        label: 'Everyone',
+    },
+];
+
 
 export default function ProposalModal() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-
-    const [members, setMember] = React.useState([]);
-    async function readMember() {
-        const usersRef = collection(firebaseFirestore, "users");
-        var arr = [];
-        await getDocs(query(usersRef)).then((snapshot) => {
-            snapshot.forEach(async (doc: any) => {
-                await arr.push({
-                    value: doc.data().name,
-                    label: doc.data().name,
-                })
-            });
-        });
-        await arr.push({
-            value: 'Everyone',
-            label: 'Everyone',
-        })
-        await setMember(arr);
-    };
-
     const [title, setTitle] = React.useState('');
 
     const handleTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +87,13 @@ export default function ProposalModal() {
 
     const handlePriority = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPriority(event.target.value);
+    };
+
+    // Reward
+    const [reward, setReward] = React.useState(0);
+
+    const handleReward = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setReward(event.target.value);
     };
 
     // Assign
@@ -117,7 +116,6 @@ export default function ProposalModal() {
 
     useEffect(() => {
         connect();
-        readMember();
     }, []);
 
     const connect = async () => {
@@ -180,11 +178,21 @@ export default function ProposalModal() {
 
                     <TextField
                         id="outlined-select-currency"
+                        label="Reword(PXC)"
+                        value={reward}
+                        onChange={handleReward}
+                    >
+                    </TextField>
+
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}></Typography>
+
+                    <TextField
+                        id="outlined-select-currency"
                         select
-                        label="Assign"
+                        label="Token distribution"
                         value={assign}
                         onChange={handleAssign}
-                        helperText="Please select who to assign the task"
+                        helperText="Please select who to get the token"
                     >
                         {members.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
@@ -208,7 +216,7 @@ export default function ProposalModal() {
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}></Typography>
 
                     <Button variant="contained" endIcon={<AddCircleIcon />} onClick={async () => {
-                        await AddProposal(title, description, priority, assign, date, currentAccount)
+                        await AddProposal(title, description, priority, reward, assign, date, currentAccount)
                         await handleClose()
                     }} >
                         Add
