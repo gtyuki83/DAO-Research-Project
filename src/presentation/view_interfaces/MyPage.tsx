@@ -219,9 +219,9 @@ const MyPage = (props) => {
     </Box >
     <Divider></Divider>
     <Stack direction="row" spacing={1}>
-      <Chip label="#Unyte" color="primary" onClick={handleClick} />
-      <Chip label="#PolygonTokyoHack" color="primary" variant="outlined" onClick={handleClick} />
-      <Chip label="#ETHOnline" color="primary" variant="outlined" onClick={handleClick} />
+      <Chip label="#DAO研究会" color="primary" onClick={handleClick} />
+      {/* <Chip label="#PolygonTokyoHack" color="primary" variant="outlined" onClick={handleClick} />
+      <Chip label="#ETHOnline" color="primary" variant="outlined" onClick={handleClick} /> */}
     </Stack>
     <CenteredTabs labels={[`Proposal(${activity.proposals})`, `Tasks(${activity.tasks})`, `comments(${activity.comments})`]}>
       <div>

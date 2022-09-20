@@ -50,7 +50,7 @@ function App() {
             <Header />
             <Box flex={1} overflow="auto">
               <SlideRoutes>
-                <Route path="/" element={<Token />} />
+                <Route path="/" element={<MyPage />} />
                 <Route exact path="/tasks" element={<Tasks />} />
                 <Route exact path="/tasks/:id" element={<TaskDetail />} />
                 <Route path="/proposals" element={<Proposals />} />
