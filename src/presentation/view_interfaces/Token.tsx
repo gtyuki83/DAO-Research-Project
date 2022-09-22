@@ -76,6 +76,25 @@ const Token = () => {
   const [to, setTo] = useState(null);
   const [amount, setAmount] = useState(0);
 
+  // admin以外は管理画面へのアクセスを許可しない
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // ユーザーのウォレットアドレス取得
+  const [currentAccount, setCurrentAccount] = useState(null);
+  useEffect(() => {
+    connect();
+  }, []);
+
+  const connect = async () => {
+    CheckWallet().then(function (result) {
+      const address = result;
+      setCurrentAccount(address);
+      if (address.toLowerCase() == "0x3a0be810754f7f7d04fca10e2c11e93ebb5bf19e" || address.toLowerCase() == "0x020f900c8ce927d7264de2285e1ae2bba5d543bc" || address.toLowerCase() == "0xd72b5feadfdf70df46268ec75ea8c579e4137a71") {
+        setIsAdmin(true)
+      }
+    });
+  };
+
   // ABIの参照
   const ContractABI = MyTokenFactoryContract.abi;
 
@@ -172,53 +191,58 @@ const Token = () => {
 
   return (
     <div className="main-container">
-      <h2>
-        独自ERC20トークン作成画面
-      </h2>
-      <TextField
-        id="name"
-        placeholder="Token Name"
-        margin="normal"
-        onChange={(e) => setName(e.target.value)}
-        variant="outlined"
-        inputProps={{ 'aria-label': 'bare' }}
-        required={true}
-      />
-      <TextField
-        id="symbol"
-        placeholder="Token Symbol"
-        margin="normal"
-        onChange={(e) => setSymbol(e.target.value)}
-        variant="outlined"
-        inputProps={{ 'aria-label': 'bare' }}
-        required={true}
-      />
-      <br />
-      <Button onClick={buttonDeploy} variant="contained" color="primary">
-        MyTokenデプロイ
-      </Button>
-      <br />
-      <TextField
-        id="to"
-        placeholder="To"
-        margin="normal"
-        onChange={(e) => setTo(e.target.value)}
-        variant="outlined"
-        inputProps={{ 'aria-label': 'bare' }} />
-      <TextField
-        id="amount"
-        placeholder="Amount"
-        margin="normal"
-        onChange={(e) => setAmount(e.target.value)}
-        variant="outlined"
-        inputProps={{ 'aria-label': 'bare' }} />
-      <br />
-      <br />
-      <Button onClick={buttonMint} variant="contained" color="primary">
-        30UYZをミント
-      </Button>
-      <br />
-      {displayMyTokens()}
+      {isAdmin ?
+        <div>
+          <h2>
+            独自ERC20トークン作成画面
+          </h2>
+          <TextField
+            id="name"
+            placeholder="Token Name"
+            margin="normal"
+            onChange={(e) => setName(e.target.value)}
+            variant="outlined"
+            inputProps={{ 'aria-label': 'bare' }}
+            required={true}
+          />
+          <TextField
+            id="symbol"
+            placeholder="Token Symbol"
+            margin="normal"
+            onChange={(e) => setSymbol(e.target.value)}
+            variant="outlined"
+            inputProps={{ 'aria-label': 'bare' }}
+            required={true}
+          />
+          <br />
+          <Button onClick={buttonDeploy} variant="contained" color="primary">
+            MyTokenデプロイ
+          </Button>
+          <br />
+          <TextField
+            id="to"
+            placeholder="To"
+            margin="normal"
+            onChange={(e) => setTo(e.target.value)}
+            variant="outlined"
+            inputProps={{ 'aria-label': 'bare' }} />
+          <TextField
+            id="amount"
+            placeholder="Amount"
+            margin="normal"
+            onChange={(e) => setAmount(e.target.value)}
+            variant="outlined"
+            inputProps={{ 'aria-label': 'bare' }} />
+          <br />
+          <br />
+          <Button onClick={buttonMint} variant="contained" color="primary">
+            30UYZをミント
+          </Button>
+          <br />
+          {displayMyTokens()}
+        </div>
+        :
+        <span>You have no access rights.</span>}
     </div>
   );
 };

@@ -57,6 +57,7 @@ function App() {
                 <Route exact path="/teams" element={<Teams />} />
                 <Route exact path="/teams/:teamid/:userid" element={<TeamComments />} />
                 <Route path="/mypage" element={<MyPage />} />
+                <Route path="/token" element={<Token />} />
               </SlideRoutes>
             </Box>
           </Box>
