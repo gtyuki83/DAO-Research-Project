@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@mui/styles";
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
+import InfoIcon from "@mui/icons-material/Info";
 
 import CheckWallet from "../../../data/blockchain_actions/checkWallet";
 import Login from "../../../data/blockchain_actions/login";
@@ -25,6 +28,10 @@ const useStyles = makeStyles(() => ({
 export default function ButtonAppBar() {
   const classes = useStyles();
   const [currentAccount, setCurrentAccount] = useState(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen); // Drawer の開閉状態を反転
+  };
 
   useEffect(() => {
     // CheckWallet();
@@ -63,19 +70,70 @@ export default function ButtonAppBar() {
               Unyte
             </Box>
           </Typography>
-          <Button color="inherit" component={Link} to="/tasks">Tasks</Button>
-          <Button color="inherit" component={Link} to="/proposals">Proposals</Button>
-          <Button color="inherit" component={Link} to="/teams">Team</Button>
-          {currentAccount && (
-            <Button color="inherit" component={Link} to="/mypage">
-              {currentAccount.slice(0, 6)}...{currentAccount.slice(-6)}
-            </Button>
-          )}
-          {!currentAccount && (
-            <Button color="inherit" onClick={() => connect()}>
-              Login
-            </Button>
-          )}
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }} >
+            <Button color="inherit" component={Link} to="/tasks">Tasks</Button>
+            <Button color="inherit" component={Link} to="/proposals">Proposals</Button>
+            <Button color="inherit" component={Link} to="/teams">Team</Button>
+            {currentAccount && (
+              <Button color="inherit" component={Link} to="/mypage">
+                {currentAccount.slice(0, 6)}...{currentAccount.slice(-6)}
+              </Button>
+            )}
+            {!currentAccount && (
+              <Button color="inherit" onClick={() => connect()}>
+                Login
+              </Button>
+            )}
+          </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              onClick={handleDrawerToggle}
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+          </Box>
+          <Drawer
+            variant="temporary"
+            open={drawerOpen}
+            onClose={handleDrawerToggle}
+          >
+            <List >
+              <ListItem>
+                <HomeIcon />
+                <Button color="inherit" component={Link} to="/" onClick={handleDrawerToggle}>Home</Button>
+              </ListItem>
+              <ListItem>
+                <InfoIcon />
+                <Button color="inherit" component={Link} to="/tasks" onClick={handleDrawerToggle}>Tasks</Button>
+              </ListItem>
+              <ListItem>
+                <InfoIcon />
+                <Button color="inherit" component={Link} to="/proposals" onClick={handleDrawerToggle}>Proposals</Button>
+              </ListItem>
+              <ListItem>
+                <InfoIcon />
+                <Button color="inherit" component={Link} to="/teams" onClick={handleDrawerToggle}>Team</Button>
+              </ListItem>
+              <ListItem>
+                <InfoIcon />
+                {currentAccount && (
+                  <Button color="inherit" component={Link} to="/mypage" onClick={handleDrawerToggle}>
+                    {currentAccount.slice(0, 6)}...{currentAccount.slice(-6)}
+                  </Button>
+                )}
+                {!currentAccount && (
+                  <Button color="inherit" onClick={() => connect()}>
+                    Login
+                  </Button>
+                )}
+              </ListItem>
+            </List>
+          </Drawer>
         </Toolbar>
       </AppBar>
     </div >
