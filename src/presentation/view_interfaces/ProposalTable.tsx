@@ -11,6 +11,10 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
 
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
@@ -132,6 +136,54 @@ export default function ProposalTable(state) {
     setPage(0);
   };
 
+  const ContentCard = (content) => {
+    return (
+      <Grid item xs={12}>
+        <Box m={2} pt={3}>
+          <Card>
+            <CardContent>
+              <Typography sx={{ mt: 1.5 }} variant="h6" component="div">
+                {content.content.Title}
+              </Typography>
+              <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                優先度：{content.content.Priority}
+              </Typography>
+              <Typography sx={{ mt: 1.5 }} variant="body2">
+                期日：
+                {content.content.Due}
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <ProposalDetail id={content.content.Id} />
+            </CardActions>
+          </Card>
+        </Box>
+      </Grid>
+    )
+  }
+
+  const ProposalCard = () => {
+    if (state.state === "ongoing") {
+      return (
+        rows.map((row, i) => {
+          if (row.Accepted === "false") {
+            return (
+              <ContentCard content={row} ></ContentCard>
+            )
+          }
+        })
+      )
+    } else if (state.state === "past") {
+      return (
+        rows.map((row, i) => {
+          return (
+            <ContentCard content={row} ></ContentCard>
+          )
+        })
+      )
+    }
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -147,14 +199,14 @@ export default function ProposalTable(state) {
             id="tableTitle"
             component="div"
           >
-            Team Unyte
+            DAO研究会
           </Typography>
 
           <ProposalModal></ProposalModal>
 
         </Toolbar >
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table" >
+        <TableContainer sx={{ display: { xs: "none", sm: "flex" } }}>
+          <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
@@ -189,7 +241,7 @@ export default function ProposalTable(state) {
                               </TableCell>
                             );
                           })}
-                          <TableCell>
+                          <TableCell >
                             <ProposalDetail id={row.Id} />
                           </TableCell>
                         </TableRow>
@@ -234,8 +286,18 @@ export default function ProposalTable(state) {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{ display: { xs: "none", sm: "flex" } }}
         />
-      </Paper>
+      </Paper >
+      <Box sx={{ display: { xs: "flex", sm: "none" } }}>
+        <Grid container>
+          <Grid item xs={12}>
+            <Box m={2} pt={3}>
+              <ProposalCard></ProposalCard>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
     </ThemeProvider >
   );
 }

@@ -11,7 +11,10 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
 
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
@@ -39,7 +42,7 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
+  width: '50%',
   color: 'white',
   bgcolor: 'background.paper',
   border: '2px solid #000',
@@ -169,7 +172,6 @@ export default function StickyHeadTable(taskid) {
     }, (error) => {
       console.error("error:", error.message);
     });
-    console.log("arr")
   }, [outputId]);
 
   const TaskOutputModal = () => {
@@ -188,9 +190,7 @@ export default function StickyHeadTable(taskid) {
             </Typography>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               link:
-            </Typography>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              {arr.link}
+              {arr.link != null && (arr.link.substr(0, 8), "...", arr.link.substr(-8))}
             </Typography>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               Descripition:
@@ -226,7 +226,7 @@ export default function StickyHeadTable(taskid) {
           <TaskOutputModal></TaskOutputModal>
 
         </Toolbar >
-        <TableContainer sx={{ maxHeight: 440 }}>
+        <TableContainer sx={{ display: { xs: "none", sm: "flex" } }}>
           <Table stickyHeader aria-label="sticky table" >
             <TableHead>
               <TableRow>
@@ -274,8 +274,41 @@ export default function StickyHeadTable(taskid) {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{ display: { xs: "none", sm: "flex" } }}
         />
       </Paper >
+      <Box sx={{ display: { xs: "flex", sm: "none" } }}>
+        <Grid container>
+          <Grid item xs={12}>
+            <Box m={2} pt={3}>
+              {rows.map((row, i) => {
+                return (
+                  <Grid item xs={12}>
+                    <Box m={2} pt={3}>
+                      <Card>
+                        <CardContent onClick={() => { handleOpen(); setOutputId(row['OutputId']); }}>
+                          <Typography sx={{ mt: 1.5 }} variant="h6" component="div">
+                            {row['Link']}
+                          </Typography>
+                          <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                            {row['Description']}
+                          </Typography>
+                          <Typography sx={{ mt: 1.5 }} variant="body2">
+                            {row['CreatedBy']}
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          {/* <ProposalDetail id={content.content.Id} /> */}
+                        </CardActions>
+                      </Card>
+                    </Box>
+                  </Grid>
+                )
+              })}
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
     </ThemeProvider >
   );
 }

@@ -356,7 +356,7 @@ export default function EnhancedTable() {
         return (
           <Paper sx={{ width: '100%', mb: 2 }}>
             <EnhancedTableToolbar numSelected={selected.length} teamName={tea.name} teamId={tea.id} />
-            <TableContainer>
+            <TableContainer sx={{ display: { xs: "none", sm: "flex" } }}>
               <Table
                 sx={{ minWidth: 750 }}
                 aria-labelledby="tableTitle"
@@ -431,6 +431,37 @@ export default function EnhancedTable() {
                 </TableBody>
               </Table>
             </TableContainer>
+            {/*  */}
+            <TableContainer component={Paper} sx={{ display: { xs: "flex", sm: "none" } }}>
+              <Table size="small">
+                <TableBody>
+                  {stableSort(rows, getComparator(order, orderBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                      <TableRow>
+                        <TableContainer>
+                          <Table size="small" style={{ tableLayout: "fixed" }}>
+                            <TableBody component={Link} to={`/teams/${tea.id}/${row.id}`}>
+                              {/* ここからテーブル */}
+                              <TableRow>
+                                <TableCell component="th" scope="row" style={{ width: "30%", borderBottom: "none" }}>
+                                  address
+                                </TableCell>
+                                <TableCell style={{ borderBottom: "none" }}>{row.address.substr(0, 5)}...{row.address.substr(-5)}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell component="th" scope="row" style={{ width: "30%" }}>
+                                  name
+                                </TableCell>
+                                <TableCell>{row.name}</TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
@@ -443,6 +474,6 @@ export default function EnhancedTable() {
           </Paper>
         )
       })}
-    </Box>
+    </Box >
   );
 }

@@ -39,13 +39,14 @@ const style = {
   // top: '50%',
   // left: '50%',
   // transform: 'translate(-50%, -50%)',
-  // width: 600,
+  justifyContent: "center",
+  // width: '50%',
   color: 'white',
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  // border: '2px solid #000',
   background: 'linear-gradient(45deg, #ff7f50,#ff1493)',
   boxShadow: 24,
-  p: 4,
+  // p: 4,
 };
 
 const TaskDetail = () => {
@@ -122,7 +123,7 @@ const TaskDetail = () => {
         </Typography>
 
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          description:{data.description}
+          {data.description}
         </Typography>
 
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
@@ -130,7 +131,7 @@ const TaskDetail = () => {
         </Typography>
 
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          createdBy:{data.createdBy}
+          createdBy:{data.createdBy.substr(0, 5)}...{data.createdBy.substr(-5)}
         </Typography>
         <Typography id="modal-modal-description" sx={{ mt: 10 }}>
 

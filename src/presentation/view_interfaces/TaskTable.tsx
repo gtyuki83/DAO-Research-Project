@@ -12,6 +12,10 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
 
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
@@ -187,17 +191,16 @@ export default function StickyHeadTable() {
             }}>
 
               <Typography
-                sx={{ flex: '1 1 100%' }}
-                align='left'
+                sx={{ flex: '1 1 100%', justifyContent: 'center' }}
+                align='center'
                 variant="h4"
                 id="tableTitle"
                 component="div"
               >
-                Team {tea.name}
+                {tea.name}
               </Typography>
-
             </Toolbar >
-            <TableContainer sx={{ maxHeight: 440 }}>
+            <TableContainer sx={{ display: { xs: "none", sm: "flex" } }}>
               <Table stickyHeader aria-label="sticky table" >
                 <TableHead>
                   <TableRow>
@@ -242,7 +245,7 @@ export default function StickyHeadTable() {
 
                 </TableBody>
               </Table>
-            </TableContainer>
+            </TableContainer >
             <TablePagination
               rowsPerPageOptions={[10, 25, 100]}
               component="div"
@@ -251,10 +254,38 @@ export default function StickyHeadTable() {
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{ display: { xs: "none", sm: "flex" } }}
             />
-          </Paper>
+          </Paper >
         )
       })}
+      <Box sx={{ display: { xs: "flex", sm: "none" } }}>
+        <Grid container>
+          <Grid item xs={12}>
+            {/* <ProposalCard></ProposalCard> */}
+            {rows.map((row, i) => {
+              return (
+                <Box m={2} pt={3} component={Link} to={`/tasks/${row.Id}`} style={{ textDecoration: 'none' }} >
+                  <Card>
+                    <CardContent>
+                      <Typography sx={{ mt: 1.5 }} variant="h6" component="div">
+                        {row.Title}
+                      </Typography>
+                      <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                        優先度：{row.Priority}
+                      </Typography>
+                      <Typography sx={{ mt: 1.5 }} variant="body2">
+                        期日：
+                        {row.Due}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Box>
+              )
+            })}
+          </Grid>
+        </Grid>
+      </Box>
     </ThemeProvider >
   );
 }

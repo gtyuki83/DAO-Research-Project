@@ -33,7 +33,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 600,
+    width: '50%',
     color: 'white',
     bgcolor: 'background.paper',
     border: '2px solid #000',
@@ -80,12 +80,12 @@ export default function ProposalDetail(id) {
 
     return (
         <div>
-            <Box display="flex" justifyContent="flex-end" onClick={handleOpen}>
+            <Box display="flex" justifyContent="center" >
                 <Tooltip title="Detail">
                     <Button onClick={() => {
                         handleOpen();
                         readProposal();
-                    }} style={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)' }} variant="contained" endIcon={<AddCircleIcon />}>
+                    }}  >
                         Detail
                     </Button>
                 </Tooltip>
@@ -116,7 +116,7 @@ export default function ProposalDetail(id) {
                     </Typography>
 
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        {data.createdBy}
+                        {data.createdBy.substr(0, 5)}...{data.createdBy.substr(-5)}
                     </Typography>
 
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
