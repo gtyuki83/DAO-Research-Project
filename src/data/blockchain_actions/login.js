@@ -51,35 +51,35 @@ export const Login = async () => {
                 PXC: 10,
             });
             console.log("新たなユーザーとして登録されました")
-            console.log("PXCトークンをミントします")
-            try {
-                const { ethereum } = window;
-                if (ethereum) {
-                    // const options = { gasLimit: 850000 };
-                    const provider = new ethers.providers.Web3Provider(ethereum);
-                    const signer = provider.getSigner();
-                    const tokenContract = new ethers.Contract(
-                        "0x48B01f58fc52c2C9050f15F02e19a6eB2336d9C5",
-                        MyTokenContract.abi,
-                        signer
-                    );
-                    // トークン発行
-                    // const tokenFactoryContractTxn = await tokenFactoryContract.createMyToken(
-                    //   name, symbol
-                    // );
-                    // console.log("Mining...", tokenFactoryContractTxn.hash);
-                    // await tokenFactoryContractTxn.wait();
-                    // console.log("Mined -- ", tokenFactoryContractTxn.hash);
-                    // alert("MyTokenコントラクトデプロイ成功！");
-                    // pause関数の呼び出し。
-                    console.log(accounts[0], "：←to　→amount：", 10)
-                    await tokenContract.mint(accounts[0], 10);
-                    // alert("30UYZのミント成功！");
-                }
-            } catch (e) {
-                alert("ミント失敗🥺");
-                console.error(e);
-            }
+            // console.log("PXCトークンをミントします")
+            // try {
+            //     const { ethereum } = window;
+            //     if (ethereum) {
+            //         // const options = { gasLimit: 850000 };
+            //         const provider = new ethers.providers.Web3Provider(ethereum);
+            //         const signer = provider.getSigner();
+            //         const tokenContract = new ethers.Contract(
+            //             "0x48B01f58fc52c2C9050f15F02e19a6eB2336d9C5",
+            //             MyTokenContract.abi,
+            //             signer
+            //         );
+            //         // トークン発行
+            //         // const tokenFactoryContractTxn = await tokenFactoryContract.createMyToken(
+            //         //   name, symbol
+            //         // );
+            //         // console.log("Mining...", tokenFactoryContractTxn.hash);
+            //         // await tokenFactoryContractTxn.wait();
+            //         // console.log("Mined -- ", tokenFactoryContractTxn.hash);
+            //         // alert("MyTokenコントラクトデプロイ成功！");
+            //         // pause関数の呼び出し。
+            //         console.log(accounts[0], "：←to　→amount：", 10)
+            //         await tokenContract.mint(accounts[0], 10);
+            //         // alert("30UYZのミント成功！");
+            //     }
+            // } catch (e) {
+            //     alert("ミント失敗🥺");
+            //     console.error(e);
+            // }
         }
         return (accounts[0]);
     } catch (error) {
