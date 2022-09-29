@@ -89,7 +89,7 @@ const Token = () => {
     CheckWallet().then(function (result) {
       const address = result;
       setCurrentAccount(address);
-      if (address.toLowerCase() == "0x3a0be810754f7f7d04fca10e2c11e93ebb5bf19e" || address.toLowerCase() == "0x020f900c8ce927d7264de2285e1ae2bba5d543bc" || address.toLowerCase() == "0xd72b5feadfdf70df46268ec75ea8c579e4137a71") {
+      if (address.toLowerCase() == "0x3a0be810754f7f7d04fca10e2c11e93ebb5bf19e" || address.toLowerCase() == "0x020f900c8ce927d7264de2285e1ae2bba5d543bc" || address.toLowerCase() == "0xd72b5feadfdf70df46268ec75ea8c579e4137a71" || address.toLowerCase() == "0x911608c090f983d02a9f30b81b9ff48091a5f71d") {
         setIsAdmin(true)
       }
     });
