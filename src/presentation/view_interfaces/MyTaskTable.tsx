@@ -11,10 +11,16 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
 
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
 import { useEffect, useState } from 'react';
+// リンクへのアクセス
+import { Link } from "react-router-dom";
 
 // Firebase関係
 import {
@@ -170,82 +176,110 @@ export default function MyProposalTable() {
     <ThemeProvider theme={theme}>
       {team.map((tea, index) => {
         return (
-          <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <Toolbar sx={{
-              pl: { sm: 2 },
-              pr: { xs: 1, sm: 1 }
-            }}>
+          <Box>
+            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+              <Toolbar sx={{
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 }
+              }}>
 
-              <Typography
-                sx={{ flex: '1 1 100%' }}
-                align='left'
-                variant="h4"
-                id="tableTitle"
+                <Typography
+                  sx={{ flex: '1 1 100%' }}
+                  align='left'
+                  variant="h4"
+                  id="tableTitle"
+                  component="div"
+                >
+                  Team {tea.name}
+                </Typography>
+
+                {/* <ProposalModal></ProposalModal> */}
+
+              </Toolbar >
+              <TableContainer sx={{ display: { xs: "none", sm: "flex" } }}>
+                <Table stickyHeader aria-label="sticky table" >
+                  <TableHead>
+                    <TableRow>
+                      {columns.map((column) => (
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          style={{ minWidth: column.minWidth }}
+                        >
+                          {column.label}
+                        </TableCell>
+                      ))}
+                      <TableCell></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {
+                      rows
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((row, i) => {
+                          // ここで適当な変数を変える処理を入れておけば、Useeffectを叩くと再描画できそう
+                          if (row.Team === tea.id) {
+                            return (
+                              <TableRow hover role="checkbox" tabIndex={-1} key={row.Id}>
+                                {columns.map((column) => {
+                                  const value = row[column.id];
+                                  return (
+                                    <TableCell key={column.id} align={column.align}>
+                                      {column.format && typeof value === 'number'
+                                        ? column.format(value)
+                                        : value}
+                                    </TableCell>
+                                  );
+                                })}
+                                <TableCell>
+                                  <ProposalDetail id={row.Id} />
+                                </TableCell>
+                              </TableRow>
+                            );
+                          }
+                        })
+                    }
+
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[10, 25, 100]}
                 component="div"
-              >
-                Team {tea.name}
-              </Typography>
-
-              {/* <ProposalModal></ProposalModal> */}
-
-            </Toolbar >
-            <TableContainer sx={{ maxHeight: 440 }}>
-              <Table stickyHeader aria-label="sticky table" >
-                <TableHead>
-                  <TableRow>
-                    {columns.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align={column.align}
-                        style={{ minWidth: column.minWidth }}
-                      >
-                        {column.label}
-                      </TableCell>
-                    ))}
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {
-                    rows
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row, i) => {
-                        // ここで適当な変数を変える処理を入れておけば、Useeffectを叩くと再描画できそう
-                        if (row.Team === tea.id) {
-                          return (
-                            <TableRow hover role="checkbox" tabIndex={-1} key={row.Id}>
-                              {columns.map((column) => {
-                                const value = row[column.id];
-                                return (
-                                  <TableCell key={column.id} align={column.align}>
-                                    {column.format && typeof value === 'number'
-                                      ? column.format(value)
-                                      : value}
-                                  </TableCell>
-                                );
-                              })}
-                              <TableCell>
-                                <ProposalDetail id={row.Id} />
-                              </TableCell>
-                            </TableRow>
-                          );
-                        }
-                      })
-                  }
-
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Paper>
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                sx={{ display: { xs: "none", sm: "flex" } }}
+              />
+            </Paper>
+            < Box sx={{ display: { xs: "flex", sm: "none" } }}>
+              <Grid container>
+                <Grid item xs={12}>
+                  {rows.map((row, i) => {
+                    return (row.CreatedBy === currentAccount.toLowerCase() && (
+                      <Box m={2} pt={3}>
+                        <Card>
+                          <CardContent>
+                            <Typography sx={{ mt: 1.5 }} variant="h6" component="div">
+                              {row.Link}
+                            </Typography>
+                            <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                              {row.Description}
+                            </Typography>
+                          </CardContent>
+                          <CardActions>
+                            <ProposalDetail id={row.Id} />
+                          </CardActions>
+                        </Card>
+                      </Box>
+                    ))
+                  })}
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
         )
       })}
     </ThemeProvider >

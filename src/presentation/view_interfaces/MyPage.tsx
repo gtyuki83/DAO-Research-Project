@@ -21,6 +21,9 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
 
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
@@ -52,7 +55,8 @@ const style = {
   // top: '50%',
   // left: '50%',
   // transform: 'translate(-50%, -50%)',
-  // width: 600,
+  justifyContent: 'center',
+  // width: '80%',
   color: 'white',
   bgcolor: 'background.paper',
   border: '2px solid #000',
@@ -179,7 +183,7 @@ const MyPage = (props) => {
   return <div className="">
     <Box>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table sx={{ minWidth: 650, display: { xs: "none", sm: "flex" } }} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>
@@ -216,6 +220,32 @@ const MyPage = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
+      < Box sx={{ display: { xs: "flex", sm: "none" } }}>
+        <Grid container>
+          <Grid item xs={12}>
+            <Box>
+              {rows.map((row, i) => {
+                return (
+                  <Grid item xs={12}>
+                    <Box >
+                      <Card>
+                        <CardContent>
+                          <Typography sx={{ mt: 1.5 }} variant="h6" component="div">
+                            {row.name}
+                          </Typography>
+                          <Typography sx={{ mt: 1.5 }} color="text.secondary">
+                            address：{row.address}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  </Grid>
+                )
+              })}
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
     </Box >
     <Divider></Divider>
     <Stack direction="row" spacing={1}>
@@ -225,51 +255,15 @@ const MyPage = (props) => {
     </Stack>
     <CenteredTabs labels={[`Proposal(${activity.proposals})`, `Tasks(${activity.tasks})`, `comments(${activity.comments})`]}>
       <div>
-        <Box sx={style}>
-          <Typography
-            sx={{ flex: '1 1 100%' }}
-            align='center'
-            variant="h6"
-            component="div"
-          >
-            Earned：{`${activity.proposals * 30}`} PSL
-            <br />
-            Great!
-          </Typography>
-        </Box>
         <MyProposalTable />
       </div>
       <div>
-        <Box sx={style}>
-          <Typography
-            sx={{ flex: '1 1 100%' }}
-            align='center'
-            variant="h6"
-            component="div"
-          >
-            Earned：{`${activity.tasks * 30}`} SMT
-            <br />
-            Good!
-          </Typography>
-        </Box>
         <MyTaskTable />
       </div>
       <div>
-        <Box sx={style}>
-          <Typography
-            sx={{ flex: '1 1 100%' }}
-            align='center'
-            variant="h6"
-            component="div"
-          >
-            Earned：{`${activity.comments * 30}`} ADM
-            <br />
-            Nice!
-          </Typography>
-        </Box>
         <MyCommentTable />
       </div>
-    </CenteredTabs>
+    </CenteredTabs >
   </div >;
 };
 
