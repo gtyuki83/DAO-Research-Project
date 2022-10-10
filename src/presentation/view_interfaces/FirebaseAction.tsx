@@ -66,26 +66,6 @@ export async function AddProposal(title, description, priority, rewa, assign, du
                 if (docSnap.data().PXC < reward) {
                     alert("所持トークンが足りません🥺")
                 } else {
-                    console.log(parseInt(pxc / 2))
-                    await updateDoc(docRef, {
-                        PXC: pxc - parseInt(reward / 2)
-                    });
-
-                    // 提案の登録
-                    const proposalsRef = collection(firebaseFirestore, "proposals");
-                    const newDoc = doc(proposalsRef).id;
-                    const documentRef = await setDoc(doc(proposalsRef, newDoc), {
-                        accepted: false,
-                        title: title,
-                        description: description,
-                        priority: priority,
-                        assign: assign,
-                        due: due,
-                        createdBy: createdBy,
-                        reward: reward,
-                        team: "tgPrPgpNPVpc1pIkKgSF",
-                        id: newDoc,
-                    });
                     try {
                         // 報酬額を自分のウォレットから払い出す
                         const { ethereum } = window;
@@ -100,11 +80,32 @@ export async function AddProposal(title, description, priority, rewa, assign, du
                         // pause関数の呼び出し。
                         await tokenContract.transfer("0x80a6a28291DD9226f36fa27Ee9C750119087E08a", reward);
                         await tokenContract.mint(createdBy, parseInt(reward / 2));
+
+                        console.log(parseInt(pxc / 2))
+                        await updateDoc(docRef, {
+                            PXC: pxc - parseInt(reward / 2)
+                        });
+
+                        // 提案の登録
+                        const proposalsRef = collection(firebaseFirestore, "proposals");
+                        const newDoc = doc(proposalsRef).id;
+                        const documentRef = await setDoc(doc(proposalsRef, newDoc), {
+                            accepted: false,
+                            title: title,
+                            description: description,
+                            priority: priority,
+                            assign: assign,
+                            due: due,
+                            createdBy: createdBy,
+                            reward: reward,
+                            team: "tgPrPgpNPVpc1pIkKgSF",
+                            id: newDoc,
+                        });
                     } catch (error) {
                         alert(`送金に失敗しました。`);
                         console.error(error);
                     }
-                    alert("成功！");
+                    // alert("成功！");
                 }
             } else {
                 alert("報酬額は整数で入力してください🥺");
@@ -198,6 +199,62 @@ export function SubmitComment(teamid, from, to, comment) {
     } catch (error) { }
 };
 
+export async function votingAction(proposalid, userid, vote) {
+    const docRef = doc(firebaseFirestore, `proposals/${proposalid}/voting`, userid.toLowerCase());
+    const docSnap = await getDoc(docRef);
+    const votingsRef = collection(firebaseFirestore, `proposals/${proposalid}/voting`);
+    if (docSnap.exists()) {
+        await updateDoc(docRef, {
+            vote: vote
+        });
+        // alert(`${vote}に投票内容を更新しました！`)
+    } else {
+        await setDoc(doc(votingsRef, userid.toLowerCase()), {
+            id: userid.toLowerCase(),
+            vote: vote
+        });
+        // alert(`${userid}：${vote}で投票しました！`)
+    }
+    // 提案が未承認の場合、チームメンバー数の2/3にfor数が達しているかを確認、達していた場合には承認済に変更し通知
+    const proposalRef = await getDoc(doc(firebaseFirestore, `proposals/${proposalid}`));
+    console.log(proposalRef.data())
+    // チームID取得
+    const teamid = proposalRef.data().team
+    // ユーザーデータを参照、teamidに該当するチームに所属している人数を確認
+    const usersRef = collection(firebaseFirestore, "users");
+    const snapshot = await getDocs(usersRef);
+    var memberamount = 0;
+    snapshot.forEach(async (document) => {
+        if (document.data().team.includes(teamid)) {
+            memberamount += 1;
+        } else {
+        }
+    });
+    // forの意思表示をしている人数をカウント
+    const snapshot2 = await getDocs(votingsRef);
+    var foramount = 0;
+    snapshot2.forEach(async (document) => {
+        if (document.data().vote == "for") {
+            foramount += 1;
+        } else {
+        }
+    });
+    // チームメンバー数の2/3にfor数が達しているかを確認、達していた場合には承認済に変更し通知
+    console.log(foramount, memberamount)
+    const border = memberamount * 1 / 2;
+    if (foramount > border) {
+        console.log("過半数に達したので提案は承認されました", border)
+        await updateDoc(doc(firebaseFirestore, `proposals/${proposalid}`), {
+            accepted: true
+        });
+        alert("提案は承認されました")
+        return ("success")
+    } else {
+        console.log("まだ過半数ではない")
+        return ("success")
+    }
+}
+
 export async function countActivity(address) {
     console.log(address)
     // 提案、アウトプット提出、コメントのうち、該当アドレスから発出されたものをカウント
@@ -217,4 +274,32 @@ export async function countActivity(address) {
     arr.push(snapshot2.size)
 
     return (arr);
+}
+
+export async function countProposal(address) {
+    // アドレスが所属するチームを特定、IDを配列に保存
+    var teams = [];
+    var ongoing = 0;
+    var past = 0;
+    const docRef = doc(firebaseFirestore, "users", address.toLowerCase());
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        // 参加済チームに今回のチームidを追加
+        teams = docSnap.data().team;
+        // 所属チームIDが含まれるProposalの数をカウント
+        const proposalsRef = collection(firebaseFirestore, "proposals");
+        const snapshot = await getDocs(proposalsRef);
+        snapshot.forEach(async (document) => {
+            if (teams.includes(document.data().team) && document.data().accepted == true) {
+                past += 1;
+            } else if (teams.includes(document.data().team) && document.data().accepted == false) {
+                ongoing += 1;
+            }
+            else {
+            }
+        });
+        return ([ongoing, past])
+    } else {
+        return ([0, 0])
+    }
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import Paper from '@mui/material/Paper';
 import Tabs from '@mui/material/Tabs';
@@ -11,6 +11,8 @@ import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import ProposalTable from "./ProposalTable.tsx";
+import CheckWallet from "../../data/blockchain_actions/checkWallet";
+import { countProposal } from "./FirebaseAction.tsx";
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -33,6 +35,29 @@ const TabPanel = (props) => {
 }
 
 const Proposal = () => {
+  // 各アクティビティの実績数を取得する状態変数
+  const [numProposals, setNumProposals] = React.useState({
+    "ongoing": 0,
+    "past": 0,
+  });
+  const [currentAccount, setCurrentAccount] = useState(null);
+  useEffect(() => {
+    connect();
+  }, []);
+
+  const connect = async () => {
+    CheckWallet().then(function (result) {
+      const address = result;
+      setCurrentAccount(address);
+      countProposal(address).then(function (result) {
+        setNumProposals({
+          "ongoing": result[0],
+          "past": result[1],
+        })
+      })
+    });
+  };
+
   const hoge: string = "";
   const CenteredTabs = (props) => {
     const [value, setValue] = React.useState(0);
@@ -63,12 +88,12 @@ const Proposal = () => {
     );
   }
   return <div>
-    <CenteredTabs labels={['OnGoing (3)', 'Past (5)']}>
+    <CenteredTabs labels={[`Ongoing (${numProposals.ongoing})`, `Past (${numProposals.past})`]}>
       <div>
-        <ProposalTable state='ongoing'></ProposalTable>
+        <ProposalTable state='ongoing' ></ProposalTable>
       </div>
       <div>
-        <ProposalTable state='past'></ProposalTable>
+        <ProposalTable state='past' ></ProposalTable>
       </div>
     </CenteredTabs >
   </div >;

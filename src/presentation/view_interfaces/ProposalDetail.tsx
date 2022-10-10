@@ -4,18 +4,27 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import Tooltip from '@mui/material/Tooltip';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
 import { Link } from "react-router-dom";
+import Paper from '@mui/material/Paper';
 
 import { useEffect, useState } from 'react';
+import {
+    useParams,
+} from 'react-router-dom';
 // Firebase関係
 import {
     doc,
@@ -26,14 +35,16 @@ import {
 } from "firebase/firestore";
 import { firebaseFirestore } from "../../data/Firebase";
 
-import { AcceptProposal } from "./FirebaseAction.tsx";
+import { AcceptProposal, votingAction } from "./FirebaseAction.tsx";
+import CheckWallet from "../../data/blockchain_actions/checkWallet";
+import { OutputAlert } from "./SnackBar.tsx";
 
 const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '50%',
+    width: 600,
     color: 'white',
     bgcolor: 'background.paper',
     border: '2px solid #000',
@@ -42,11 +53,14 @@ const style = {
     p: 4,
 };
 
-
-export default function ProposalDetail(id) {
+export default function ProposalDetail() {
+    const { id } = useParams();
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [voting, setVoting] = React.useState({ 0x00: "for" });
+    const [votingResult, setVotingResult] = React.useState(false);
+    const [snack, setSnack] = React.useState('false');
 
     const [data, setData] = React.useState({
         assign: '',
@@ -55,12 +69,14 @@ export default function ProposalDetail(id) {
         description: '',
         createdBy: '',
     });
-    // setValues({ ...values, title: 'changed title' });
+
+    const [currentAccount, setCurrentAccount] = useState(null);
 
     async function readProposal() {
-        const docRef: any = doc(firebaseFirestore, "proposals", id.id);
+        var arr = {};
+        const docRef: any = doc(firebaseFirestore, "proposals", id);
         const docSnap: any = await getDoc(docRef);
-
+        // proposalの存在を判定
         if (docSnap.exists()) {
             setData({
                 title: docSnap.data().title,
@@ -69,27 +85,148 @@ export default function ProposalDetail(id) {
                 description: docSnap.data().description,
                 createdBy: docSnap.data().createdBy,
             });
+            // setVotingId();
         } else {
             console.log("No such document!");
         }
+        // votingの存在を判定
+        const querySnapshot = await getDocs(collection(firebaseFirestore, `proposals/${id}/voting`));
+        querySnapshot.docs.map((doc, i) => {
+            arr[doc.id] = doc.data().vote
+        });
+        setVoting(arr);
+        // votingがacceptedされている場合は状態をtrueにセット
+        if (docSnap.data().accepted == true) {
+            setVotingResult(true);
+        }
     };
-    // useEffect(() => {
-    //     console.log("毎回実行");
-    //     readProposal();
-    // }, []);
+    useEffect(() => {
+        connect();
+        readProposal();
+    }, [voting]);
+
+    const connect = async () => {
+        CheckWallet().then(function (result) {
+            const address = result;
+            setCurrentAccount(address);
+        });
+    };
 
     return (
         <div>
-            <Box display="flex" justifyContent="center" >
+            <OutputAlert snack={snack} setSnack={setSnack}></OutputAlert>
+            <Box display="flex" >
+                <Button variant="contained" endIcon={<ArrowBackIosNewIcon />} component={Link} to={`/proposals`} >
+                    Back
+                </Button>
+            </Box>
+            {/* <Box display="flex" justifyContent="flex-end" onClick={handleOpen}>
                 <Tooltip title="Detail">
                     <Button onClick={() => {
                         handleOpen();
                         readProposal();
-                    }}  >
+                    }} style={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)' }} variant="contained" endIcon={<AddCircleIcon />}>
                         Detail
                     </Button>
                 </Tooltip>
+            </Box> */}
+            {/* テスト：カード表示 */}
+            <Card >
+
+                <CardContent>
+                    {votingResult && (
+                        <Button sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
+                            <Typography>
+                                承認済
+                            </Typography>
+                        </Button>
+                    )
+                    }
+                    <Typography gutterBottom variant="h5" component="div">
+                        {data.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        {data.description}
+                    </Typography>
+                </CardContent>
+                <CardActions sx={{ justifyContent: 'center' }}>
+                    <Box sx={{ justifyContent: 'center' }}>
+                        proposed by:
+                        <Button size="small" component={Link} to={`/profile/${data.createdBy}`}>
+                            ニックネーム未設定({data.createdBy.substr(0, 5)}...{data.createdBy.substr(-5)})
+                        </Button>
+                    </Box>
+                </CardActions>
+            </Card>
+
+            {votingResult && (
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    <Button disabled variant="contained" endIcon={<AddCircleIcon />} sx={{ width: 120, m: 2 }} >
+                        For
+                    </Button>
+                    <Button disabled variant="contained" endIcon={<RemoveCircleIcon />} sx={{ width: 120, m: 2 }} >
+                        Against
+                    </Button>
+                </Typography>
+            )
+            }
+            {votingResult == false && (
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    <Button variant="contained" endIcon={<AddCircleIcon />} sx={{ width: 120, m: 2 }} onClick={async () => {
+                        const trying = await votingAction(id, currentAccount, "for");
+                        if (trying == "success") {
+                            setSnack("vote")
+                        }
+                        await readProposal();
+                    }} >
+                        For
+                    </Button>
+
+                    <Button variant="contained" endIcon={<RemoveCircleIcon />} sx={{ width: 120, m: 2 }} onClick={async () => {
+                        const trying = await votingAction(id, currentAccount, "against");
+                        if (trying == "success") {
+                            setSnack("vote")
+                        }
+                        await readProposal();
+                    }}>
+                        Against
+                    </Button>
+                </Typography>
+            )
+            }
+            <Box sx={{ justifyContent: 'center' }}>
+                <Paper sx={{ width: '100%', overflow: 'hidden', justifyContent: 'center' }}>
+                    <Typography
+                        variant="h4"
+                        id="tableTitle"
+                        component="div"
+                    >
+                        Voting
+                    </Typography>
+                    <TableContainer >
+                        <Table sx={{ justifyContent: 'center' }} aria-label="simple table">
+                            <TableBody>
+                                {Object.keys(voting).map((doc, i) => {
+                                    return (<TableRow
+                                        key={doc}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell align='center' component="th" scope="row" sx={{ width: 120, m: 2 }}>
+                                            {doc.substr(0, 5)}...{doc.substr(-5)}
+                                        </TableCell>
+                                        <TableCell align='center' component="th" scope="row" sx={{ width: 120, m: 2 }}>
+                                            {voting[doc]}
+                                        </TableCell>
+
+                                    </TableRow>)
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
             </Box>
+            {/* カード表示終わり */}
+
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -116,7 +253,7 @@ export default function ProposalDetail(id) {
                     </Typography>
 
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        {data.createdBy.substr(0, 5)}...{data.createdBy.substr(-5)}
+                        {data.createdBy}
                     </Typography>
 
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
@@ -139,6 +276,6 @@ export default function ProposalDetail(id) {
                     </Typography>
                 </Box>
             </Modal>
-        </div>
+        </div >
     );
 }

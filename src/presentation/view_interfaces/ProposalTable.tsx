@@ -16,9 +16,12 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
 import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 
 // Firebase関係
 import {
@@ -139,8 +142,8 @@ export default function ProposalTable(state) {
   const ContentCard = (content) => {
     return (
       <Grid item xs={12}>
-        <Box m={2} pt={3}>
-          <Card>
+        <Box m={2} pt={3} sx={{ border: 1, boxShadow: 3 }}>
+          <Card component={Link} to={`/proposals/${content.content.Id}`} style={{ textDecoration: 'none' }}>
             <CardContent>
               <Typography sx={{ mt: 1.5 }} variant="h6" component="div">
                 {content.content.Title}
@@ -154,7 +157,9 @@ export default function ProposalTable(state) {
               </Typography>
             </CardContent>
             <CardActions>
-              <ProposalDetail id={content.content.Id} />
+              <Button variant="contained" component={Link} to={`/proposals/${content.content.Id}`} >
+                Detail
+              </Button>
             </CardActions>
           </Card>
         </Box>
@@ -230,7 +235,7 @@ export default function ProposalTable(state) {
                     if (row.Accepted === "false") {
                       // ここで適当な変数を変える処理を入れておけば、Useeffectを叩くと再描画できそう
                       return (
-                        <TableRow hover role="checkbox" tabIndex={-1} key={row.Id}>
+                        <TableRow hover role="checkbox" tabIndex={-1} key={row.Id} component={Link} to={`/proposals/${row.Id}`} style={{ textDecoration: 'none' }}>
                           {columns.map((column) => {
                             const value = row[column.id];
                             return (
@@ -241,8 +246,10 @@ export default function ProposalTable(state) {
                               </TableCell>
                             );
                           })}
-                          <TableCell >
-                            <ProposalDetail id={row.Id} />
+                          <TableCell>
+                            <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/proposals/${row.Id}`} >
+                              Detail
+                            </Button>
                           </TableCell>
                         </TableRow>
                       );
@@ -256,7 +263,7 @@ export default function ProposalTable(state) {
                   .map((row, i) => {
                     // ここで適当な変数を変える処理を入れておけば、Useeffectを叩くと再描画できそう
                     return (
-                      <TableRow hover role="checkbox" tabIndex={-1} key={row.Id}>
+                      <TableRow hover role="checkbox" tabIndex={-1} key={row.Id} component={Link} to={`/proposals/${row.Id}`} style={{ textDecoration: 'none' }}>
                         {columns.map((column) => {
                           const value = row[column.id];
                           return (
@@ -268,7 +275,9 @@ export default function ProposalTable(state) {
                           );
                         })}
                         <TableCell>
-                          <ProposalDetail id={row.Id} />
+                          <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/proposals/${row.Id}`} >
+                            Detail
+                          </Button>
                         </TableCell>
                       </TableRow>
                     );

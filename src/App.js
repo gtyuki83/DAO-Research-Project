@@ -10,6 +10,7 @@ import Header from "./presentation/view_interfaces/components/Header";
 import Teams from "./presentation/view_interfaces/Teams.tsx";
 import TeamComments from "./presentation/view_interfaces/TeamComments.tsx";
 import Proposals from "./presentation/view_interfaces/Proposals.tsx";
+import ProposalDetail from "./presentation/view_interfaces/ProposalDetail.tsx";
 import Tasks from "./presentation/view_interfaces/Tasks.tsx";
 import TaskDetail from "./presentation/view_interfaces/TaskDetail.tsx";
 import MyPage from "./presentation/view_interfaces/MyPage.tsx";
@@ -54,6 +55,7 @@ function App() {
                 <Route exact path="/tasks" element={<Tasks />} />
                 <Route exact path="/tasks/:id" element={<TaskDetail />} />
                 <Route path="/proposals" element={<Proposals />} />
+                <Route path="/proposals/:id" element={<ProposalDetail />} />
                 <Route exact path="/teams" element={<Teams />} />
                 <Route exact path="/teams/:teamid/:userid" element={<TeamComments />} />
                 <Route path="/mypage" element={<MyPage />} />
