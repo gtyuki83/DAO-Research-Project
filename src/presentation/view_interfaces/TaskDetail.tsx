@@ -41,7 +41,7 @@ import { SubmitOutput } from "./FirebaseAction.tsx";
 import CheckWallet from "../../data/blockchain_actions/checkWallet";
 
 import TaskOutputTable from "./TaskOutputTable.tsx";
-import { AcceptProposal, votingAction } from "./FirebaseAction.tsx";
+import { AcceptProposal, votingAction, sendReward } from "./FirebaseAction.tsx";
 import { OutputAlert } from "./SnackBar.tsx";
 
 import {
@@ -78,6 +78,7 @@ const TaskDetail = () => {
 
   const [voting, setVoting] = React.useState({ 0x00: "for" });
   const [votingResult, setVotingResult] = React.useState(false);
+  const [sentReward, setSentReward] = React.useState(false);
   const [snack, setSnack] = React.useState('false');
 
   async function readProposal() {
@@ -107,6 +108,10 @@ const TaskDetail = () => {
     // votingがacceptedされている場合は状態をtrueにセット
     if (docSnap.data().success == true) {
       setVotingResult(true);
+    }
+    // 報酬が支払われていればtrue
+    if (docSnap.data().rewarded == true) {
+      setSentReward(true);
     }
   };
 
@@ -148,6 +153,23 @@ const TaskDetail = () => {
       <Card >
 
         <CardContent>
+          {votingResult && !sentReward && (
+            <Button onClick={() => sendReward(id)} sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
+              <Typography>
+                報酬を送付
+              </Typography>
+            </Button>
+          )
+          }
+          {votingResult && sentReward && (
+            <Button disabled variant="outlined" sx={{ color: 'white', m: 1, mb: 3 }}>
+              <Typography>
+                報酬送付済
+              </Typography>
+            </Button>
+          )
+          }
+          <br></br>
           {votingResult && (
             <Button sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
               <Typography>

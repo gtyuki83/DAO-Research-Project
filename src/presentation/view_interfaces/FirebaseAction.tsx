@@ -256,6 +256,17 @@ export async function votingAction(proposalid, userid, vote) {
     }
 }
 
+export async function sendReward(proposalid) {
+    console.log(proposalid)
+    // 報酬を送付するアクションを実施
+    console.log("報酬送付にトライ！")
+    // 成功した場合、該当する提案のrewardedをtrueに変更
+    await updateDoc(doc(firebaseFirestore, `proposals/${proposalid}`), {
+        rewarded: true
+    });
+    console.log("報酬送付成功！")
+}
+
 export async function countActivity(address) {
     console.log(address)
     // 提案、アウトプット提出、コメントのうち、該当アドレスから発出されたものをカウント
