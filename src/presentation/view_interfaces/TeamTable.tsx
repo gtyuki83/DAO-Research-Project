@@ -67,6 +67,7 @@ interface Data {
   role: string;
   id: string;
   team: array;
+  PXC: string;
 }
 
 function createData(
@@ -75,6 +76,7 @@ function createData(
   role: string,
   id: string,
   team: array,
+  PXC: string,
 ): Data {
 
   return {
@@ -83,6 +85,7 @@ function createData(
     role,
     id,
     team,
+    PXC,
   };
 }
 
@@ -150,6 +153,12 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: 'Address',
+  },
+  {
+    id: 'PXC',
+    numeric: false,
+    disablePadding: false,
+    label: 'PXC',
   },
 ];
 
@@ -263,7 +272,7 @@ export default function EnhancedTable() {
     await getDocs(query(usersRef)).then((snapshot) => {
       snapshot.forEach(async (doc: any) => {
         // コメントを文字列に保存
-        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id, doc.data().team))
+        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id, doc.data().team, doc.data().PXC))
       });
     });
     await setRows(arr);
@@ -410,6 +419,7 @@ export default function EnhancedTable() {
                             </TableCell>
                             <TableCell>{row.role}</TableCell>
                             <TableCell>{row.address}</TableCell>
+                            <TableCell>{row.PXC}</TableCell>
                             <TableCell align='right'>
                               <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/teams/${tea.id}/${row.id}`} >
                                 Comment
@@ -449,10 +459,16 @@ export default function EnhancedTable() {
                                 <TableCell style={{ borderBottom: "none" }}>{row.address.substr(0, 5)}...{row.address.substr(-5)}</TableCell>
                               </TableRow>
                               <TableRow>
-                                <TableCell component="th" scope="row" style={{ width: "30%" }}>
+                                <TableCell component="th" scope="row" style={{ width: "30%", borderBottom: "none" }}>
                                   name
                                 </TableCell>
-                                <TableCell>{row.name}</TableCell>
+                                <TableCell style={{ borderBottom: "none" }}>{row.name}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell component="th" scope="row" style={{ width: "30%" }}>
+                                  PXC
+                                </TableCell>
+                                <TableCell>{row.PXC}PXC</TableCell>
                               </TableRow>
                             </TableBody>
                           </Table>

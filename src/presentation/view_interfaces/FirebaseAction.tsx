@@ -243,11 +243,12 @@ export async function votingAction(proposalid, userid, vote) {
     console.log(foramount, memberamount)
     const border = memberamount * 1 / 2;
     if (foramount > border) {
+        // if (foramount > 0) {
         console.log("過半数に達したので提案は承認されました", border)
         await updateDoc(doc(firebaseFirestore, `proposals/${proposalid}`), {
-            accepted: true
+            success: true
         });
-        alert("提案は承認されました")
+        alert("タスク成功！")
         return ("success")
     } else {
         console.log("まだ過半数ではない")

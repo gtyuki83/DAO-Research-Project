@@ -15,6 +15,7 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
@@ -231,9 +232,11 @@ export default function MyProposalTable() {
                                     </TableCell>
                                   );
                                 })}
-                                <TableCell>
-                                  <ProposalDetail id={row.Id} />
-                                </TableCell>
+                                {/* <TableCell>
+                                  <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
+                                    Detail
+                                  </Button>
+                                </TableCell> */}
                               </TableRow>
                             );
                           }
@@ -270,7 +273,9 @@ export default function MyProposalTable() {
                             </Typography>
                           </CardContent>
                           <CardActions>
-                            <ProposalDetail id={row.Id} />
+                            {/* <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
+                              Detail
+                            </Button> */}
                           </CardActions>
                         </Card>
                       </Box>

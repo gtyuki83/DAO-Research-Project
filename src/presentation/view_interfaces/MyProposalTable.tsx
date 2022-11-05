@@ -15,10 +15,11 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
-
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 
 import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 
 // Firebase関係
 import {
@@ -240,9 +241,9 @@ export default function MyProposalTable() {
                                     </TableCell>
                                   );
                                 })}
-                                <TableCell>
-                                  <ProposalDetail id={row.Id} />
-                                </TableCell>
+                                <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
+                                  Detail
+                                </Button>
                               </TableRow>
                             );
                           }
@@ -286,7 +287,9 @@ export default function MyProposalTable() {
                                   </Typography>
                                 </CardContent>
                                 <CardActions>
-                                  <ProposalDetail id={row.Id} />
+                                  <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/tasks/${row.Id}`} >
+                                    Detail
+                                  </Button>
                                 </CardActions>
                               </Card>
                             </Box>

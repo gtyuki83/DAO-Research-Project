@@ -81,6 +81,10 @@ const columns: readonly Column[] = [
     id: 'Accepted',
     label: 'Accepted',
   },
+  {
+    id: 'PXC',
+    label: 'PXC',
+  },
 ];
 
 interface Data {
@@ -91,6 +95,7 @@ interface Data {
   Assigned: string;
   CreatedBy: string;
   Accepted: boolean;
+  PXC: string;
 }
 
 function createData(
@@ -101,8 +106,9 @@ function createData(
   Assigned: string,
   CreatedBy: string,
   Accepted: boolean,
+  PXC: string,
 ): Data {
-  return { Id, Title, Priority, Due, Assigned, CreatedBy, Accepted };
+  return { Id, Title, Priority, Due, Assigned, CreatedBy, Accepted, PXC };
 }
 
 
@@ -118,7 +124,7 @@ export default function ProposalTable(state) {
       snapshot.forEach(async (doc: any) => {
         const time = new Date(doc.data().due.seconds * 1000);
         const dateTime = time.getFullYear().toString() + "/" + (time.getMonth() + 1).toString() + "/" + time.getDate().toString();
-        await arr.push(createData(doc.data().id, doc.data().title, doc.data().priority, dateTime, doc.data().assign, doc.data().createdBy, doc.data().accepted.toString()))
+        await arr.push(createData(doc.data().id, doc.data().title, doc.data().priority, dateTime, doc.data().assign, doc.data().createdBy, doc.data().accepted.toString(), doc.data().reward.toString()))
       });
     });
     await setRows(arr);
@@ -154,6 +160,10 @@ export default function ProposalTable(state) {
               <Typography sx={{ mt: 1.5 }} variant="body2">
                 期日：
                 {content.content.Due}
+              </Typography>
+              <Typography sx={{ mt: 1.5 }} variant="body2">
+                報酬：
+                {content.content.PXC}PXC
               </Typography>
             </CardContent>
             <CardActions>
@@ -244,6 +254,7 @@ export default function ProposalTable(state) {
                                   ? column.format(value)
                                   : value}
                               </TableCell>
+
                             );
                           })}
                           <TableCell>

@@ -57,10 +57,6 @@ export default function ButtonAppBar() {
     });
   };
 
-  const test = async () => {
-    console.log(currentAccount);
-  };
-
   return (
     <div className="">
       <AppBar position="static">
