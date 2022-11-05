@@ -90,7 +90,7 @@ export async function AddProposal(title, description, priority, rewa, assign, du
                         const proposalsRef = collection(firebaseFirestore, "proposals");
                         const newDoc = doc(proposalsRef).id;
                         const documentRef = await setDoc(doc(proposalsRef, newDoc), {
-                            accepted: false,
+                            accepted: true,
                             title: title,
                             description: description,
                             priority: priority,
