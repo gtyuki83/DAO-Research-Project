@@ -100,6 +100,10 @@ export async function AddProposal(title, description, priority, rewa, assign, du
                             reward: reward,
                             team: "tgPrPgpNPVpc1pIkKgSF",
                             id: newDoc,
+                            // ボーナス送付有無
+                            rewarded: false,
+                            // タスク完了有無
+                            done: false,
                         });
                     } catch (error) {
                         alert(`送金に失敗しました。`);
@@ -242,10 +246,11 @@ export async function votingAction(proposalid, userid, vote) {
     // チームメンバー数の2/3にfor数が達しているかを確認、達していた場合には承認済に変更し通知
     console.log(foramount, memberamount)
     const border = memberamount * 1 / 2;
-    if (foramount > border) {
-        // if (foramount > 0) {
+    // if (foramount > border) {
+    if (foramount > 0) {
         console.log("過半数に達したので提案は承認されました", border)
         await updateDoc(doc(firebaseFirestore, `proposals/${proposalid}`), {
+            accepted: true,
             success: true
         });
         alert("タスク成功！")
@@ -256,10 +261,136 @@ export async function votingAction(proposalid, userid, vote) {
     }
 }
 
+// こちらはタスク完了側の処理です
+export async function doneTask(proposalid) {
+    console.log(proposalid)
+    // 報酬を送付するアクションを実施
+    console.log("報酬送付にトライ！")
+    // 報酬額を取得
+    const proposalRef = await getDoc(doc(firebaseFirestore, `proposals/${proposalid}`));
+    const reward = proposalRef.data().reward
+    console.log(reward)
+    // タスクのアウトプットを出しているメンバーを確認
+    const outputsRef = collection(firebaseFirestore, "outputs");
+    const snapshot = await getDocs(query(outputsRef, where("taskid", "==", proposalid)));
+    var arr = [];
+    var memberCount = 0;
+    snapshot.forEach(async (document) => {
+        arr.push(document.data().account)
+        memberCount += 1
+        console.log(arr, memberCount);
+    });
+    console.log(arr, memberCount);
+
+    // 発案者に報酬を送付
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const tokenContract = new ethers.Contract(
+        "0x48B01f58fc52c2C9050f15F02e19a6eB2336d9C5",
+        MyTokenContract.abi,
+        signer
+    );
+    // 貢献者に報酬を送付
+    arr.forEach(async (ar) => {
+        console.log(ar)
+        await tokenContract.transfer(ar, parseInt(reward / memberCount));
+    })
+    // 成功したら貢献者のDBをインクリメント。発案者のアドレスを格納
+    arr.forEach(async (ar) => {
+        console.log(ar)
+        const docRef2 = doc(firebaseFirestore, "users", ar);
+        const docSnap2 = await getDoc(docRef2);
+        var proposalPXC_forcontributor = 0;
+        const rewa = parseInt(Number(reward) / memberCount)
+        if (docSnap2.exists()) {
+            proposalPXC_forcontributor = docSnap2.data().PXC + rewa
+            console.log(proposalPXC_forcontributor)
+        }
+        console.log(proposalPXC_forcontributor)
+        // 発案者のPXCを更新
+        await updateDoc(docRef2, {
+            PXC: proposalPXC_forcontributor,
+            taskPXC: rewa
+        });
+    })
+    // 成功した場合、該当する提案のrewardedをtrueに変更
+    await updateDoc(doc(firebaseFirestore, `proposals/${proposalid}`), {
+        done: true
+    });
+    console.log("報酬送付成功！")
+}
+
+// こちらはボーナス側の処理です
 export async function sendReward(proposalid) {
     console.log(proposalid)
     // 報酬を送付するアクションを実施
     console.log("報酬送付にトライ！")
+    // 報酬額を取得
+    const proposalRef = await getDoc(doc(firebaseFirestore, `proposals/${proposalid}`));
+    const reward = proposalRef.data().reward
+    console.log(reward)
+    // タスクのアウトプットを出しているメンバーを確認
+    const outputsRef = collection(firebaseFirestore, "outputs");
+    const snapshot = await getDocs(query(outputsRef, where("taskid", "==", proposalid)));
+    var arr = [];
+    var memberCount = 0;
+    snapshot.forEach(async (document) => {
+        arr.push(document.data().account)
+        memberCount += 1
+        console.log(arr, memberCount);
+    });
+    console.log(arr, memberCount);
+
+    // 発案者に報酬を送付
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const tokenContract = new ethers.Contract(
+        "0x48B01f58fc52c2C9050f15F02e19a6eB2336d9C5",
+        MyTokenContract.abi,
+        signer
+    );
+    // transfer関数の呼び出し。
+    await tokenContract.mint(proposaladdress, reward);
+    // 成功したら提案者のDBをインクリメント。発案者のアドレスを格納
+    const proposaladdress = proposalRef.data().createdBy
+    // アドレスが既に存在するか検索
+    const docRef = doc(firebaseFirestore, "users", proposaladdress);
+    const docSnap = await getDoc(docRef);
+    var proposalPXC = 0;
+    if (docSnap.exists()) {
+        proposalPXC = docSnap.data().PXC + reward
+        console.log(proposalPXC)
+    }
+    console.log(proposalPXC)
+    // 発案者のPXCを更新
+    await updateDoc(docRef, {
+        PXC: proposalPXC
+    });
+    // 貢献者に報酬を送付
+    arr.forEach(async (ar) => {
+        console.log(ar)
+        console.log(proposaladdress)
+        await tokenContract.transfer(ar, parseInt(reward / memberCount));
+    })
+    // 成功したら貢献者のDBをインクリメント。発案者のアドレスを格納
+    arr.forEach(async (ar) => {
+        console.log(ar)
+        console.log(proposaladdress)
+        const docRef2 = doc(firebaseFirestore, "users", ar);
+        const docSnap2 = await getDoc(docRef2);
+        var proposalPXC_forcontributor = 0;
+        if (docSnap2.exists()) {
+            proposalPXC_forcontributor = docSnap2.data().PXC + parseInt(Number(reward) / memberCount)
+            console.log(proposalPXC_forcontributor)
+        }
+        console.log(proposalPXC_forcontributor)
+        // 発案者のPXCを更新
+        await updateDoc(docRef2, {
+            PXC: proposalPXC_forcontributor
+        });
+    })
     // 成功した場合、該当する提案のrewardedをtrueに変更
     await updateDoc(doc(firebaseFirestore, `proposals/${proposalid}`), {
         rewarded: true

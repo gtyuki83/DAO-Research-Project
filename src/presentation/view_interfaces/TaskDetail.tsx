@@ -41,7 +41,7 @@ import { SubmitOutput } from "./FirebaseAction.tsx";
 import CheckWallet from "../../data/blockchain_actions/checkWallet";
 
 import TaskOutputTable from "./TaskOutputTable.tsx";
-import { AcceptProposal, votingAction, sendReward } from "./FirebaseAction.tsx";
+import { AcceptProposal, votingAction, sendReward, doneTask } from "./FirebaseAction.tsx";
 import { OutputAlert } from "./SnackBar.tsx";
 
 import {
@@ -78,6 +78,9 @@ const TaskDetail = () => {
 
   const [voting, setVoting] = React.useState({ 0x00: "for" });
   const [votingResult, setVotingResult] = React.useState(false);
+  // 報酬送付判定
+  const [done, setDone] = React.useState(false);
+  // ボーナス判定処理
   const [sentReward, setSentReward] = React.useState(false);
   const [snack, setSnack] = React.useState('false');
 
@@ -112,6 +115,10 @@ const TaskDetail = () => {
     // 報酬が支払われていればtrue
     if (docSnap.data().rewarded == true) {
       setSentReward(true);
+    }
+    // doneの場合はtrue
+    if (docSnap.data().done == true) {
+      setDone(true);
     }
   };
 
@@ -153,10 +160,27 @@ const TaskDetail = () => {
       <Card >
 
         <CardContent>
+          {!done && (
+            <Button onClick={() => doneTask(id)} sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
+              <Typography>
+                報酬を送付してタスクを完了にする
+              </Typography>
+            </Button>
+          )
+          }
+          {done && (
+            <Button onClick={() => null} sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
+              <Typography>
+                タスク完了済
+              </Typography>
+            </Button>
+          )
+          }
+          <br></br>
           {votingResult && !sentReward && (
             <Button onClick={() => sendReward(id)} sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
               <Typography>
-                報酬を送付
+                成功ボーナスを送付
               </Typography>
             </Button>
           )
@@ -164,16 +188,26 @@ const TaskDetail = () => {
           {votingResult && sentReward && (
             <Button disabled variant="outlined" sx={{ color: 'white', m: 1, mb: 3 }}>
               <Typography>
-                報酬送付済
+                成功ボーナス送付済
               </Typography>
             </Button>
           )
           }
           <br></br>
           {votingResult && (
-            <Button sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
+            // <Button sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
+            <Button sx={{ color: 'white', m: 1, mb: 3 }}>
               <Typography>
-                承認済
+                ステータス：成功！
+              </Typography>
+            </Button>
+          )
+          }
+          {!votingResult && (
+            // <Button sx={{ background: 'linear-gradient(45deg, #ff7f50,#ff1493)', color: 'white', m: 1, mb: 3 }}>
+            <Button sx={{ color: 'white', m: 1, mb: 3 }}>
+              <Typography>
+                ステータス：判定中
               </Typography>
             </Button>
           )
