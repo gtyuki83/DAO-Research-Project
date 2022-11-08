@@ -246,8 +246,8 @@ export async function votingAction(proposalid, userid, vote) {
     // チームメンバー数の2/3にfor数が達しているかを確認、達していた場合には承認済に変更し通知
     console.log(foramount, memberamount)
     const border = memberamount * 1 / 2;
-    // if (foramount > border) {
-    if (foramount > 0) {
+    if (foramount > border) {
+        // if (foramount > 0) {
         console.log("過半数に達したので提案は承認されました", border)
         await updateDoc(doc(firebaseFirestore, `proposals/${proposalid}`), {
             accepted: true,
