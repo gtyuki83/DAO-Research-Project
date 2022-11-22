@@ -302,16 +302,18 @@ export async function doneTask(proposalid) {
         const docRef2 = doc(firebaseFirestore, "users", ar);
         const docSnap2 = await getDoc(docRef2);
         var proposalPXC_forcontributor = 0;
+        var proposalPXC_forreward = 0;
         const rewa = parseInt(Number(reward) / memberCount)
         if (docSnap2.exists()) {
             proposalPXC_forcontributor = docSnap2.data().PXC + rewa
+            proposalPXC_forreward = docSnap2.data().taskPXC + rewa
             console.log(proposalPXC_forcontributor)
         }
         console.log(proposalPXC_forcontributor)
         // 発案者のPXCを更新
         await updateDoc(docRef2, {
             PXC: proposalPXC_forcontributor,
-            taskPXC: rewa
+            taskPXC: proposalPXC_forreward
         });
     })
     // 成功した場合、該当する提案のrewardedをtrueに変更
