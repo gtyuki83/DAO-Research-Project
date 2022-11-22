@@ -68,6 +68,7 @@ interface Data {
   id: string;
   team: array;
   PXC: string;
+  gainedPXC: string;
 }
 
 function createData(
@@ -77,6 +78,7 @@ function createData(
   id: string,
   team: array,
   PXC: string,
+  gainedPXC: string,
 ): Data {
 
   return {
@@ -86,6 +88,7 @@ function createData(
     id,
     team,
     PXC,
+    gainedPXC,
   };
 }
 
@@ -159,6 +162,12 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: 'PXC',
+  },
+  {
+    id: 'gainedPXC',
+    numeric: false,
+    disablePadding: false,
+    label: 'gainedPXC',
   },
 ];
 
@@ -272,7 +281,12 @@ export default function EnhancedTable() {
     await getDocs(query(usersRef)).then((snapshot) => {
       snapshot.forEach(async (doc: any) => {
         // コメントを文字列に保存
-        await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id, doc.data().team, doc.data().PXC))
+        // console.log(Object.keys(doc.data()).includes("taskPXC"))
+        if (Object.keys(doc.data()).includes("taskPXC")) {
+          await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id, doc.data().team, doc.data().PXC, doc.data().taskPXC.toString()))
+        } else {
+         await arr.push(createData(doc.data().address, doc.data().name, doc.data().role, doc.data().id, doc.data().team, doc.data().PXC, "0")) 
+        }
       });
     });
     await setRows(arr);
@@ -420,6 +434,7 @@ export default function EnhancedTable() {
                             <TableCell>{row.role}</TableCell>
                             <TableCell>{row.address}</TableCell>
                             <TableCell>{row.PXC}</TableCell>
+                            <TableCell>{row.gainedPXC}</TableCell>
                             <TableCell align='right'>
                               <Button variant="contained" endIcon={<ArrowForwardIosIcon />} component={Link} to={`/teams/${tea.id}/${row.id}`} >
                                 Comment
@@ -469,6 +484,12 @@ export default function EnhancedTable() {
                                   PXC
                                 </TableCell>
                                 <TableCell>{row.PXC}PXC</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell component="th" scope="row" style={{ width: "30%" }}>
+                                  taskで得たPXC
+                                </TableCell>
+                                <TableCell>{row.gainedPXC}PXC</TableCell>
                               </TableRow>
                             </TableBody>
                           </Table>
