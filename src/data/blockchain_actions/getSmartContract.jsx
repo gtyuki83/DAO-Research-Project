@@ -3,7 +3,6 @@ import { contractABI, contractAddress } from "../../contracts/connectMyToken";
 
 /*
 * スマートコントラクトを取得する関数.
-* @param
 * @return {Object} スマートコントラクトオブジェクト
 */
 export const getSmartContract = () => {
